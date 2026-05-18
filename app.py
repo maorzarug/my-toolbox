@@ -48,18 +48,21 @@ BASE_HTML = """
             --radius-lg: 16px; --radius-md: 12px;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; }
-        .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; flex-direction: row; }
+        
+        .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; overflow-y: auto; }
         .sidebar-header { padding: 30px 24px; border-bottom: 1px solid #1e293b; }
         .sidebar-header h2 { margin: 0; font-size: 22px; font-weight: 800; background: linear-gradient(to left, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sidebar-menu { padding: 15px 12px; display: flex; flex-direction: column; gap: 4px; }
         .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 14px 16px; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: var(--radius-md); transition: all 0.25s ease; }
         .sidebar a:hover { background-color: #1e293b; color: #ffffff; }
         .sidebar a.active { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        
         .main-content { margin-right: 280px; flex-grow: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; width: calc(100% - 280px); box-sizing: border-box; }
         .container { width: 100%; max-width: 850px; background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid rgba(226, 232, 242, 0.7); box-sizing: border-box; }
         h1 { color: var(--text-main); font-size: 28px; font-weight: 800; margin: 0 0 10px 0; text-align: center; }
         .description { color: var(--text-muted); font-size: 16px; margin-bottom: 30px; line-height: 1.5; text-align: center; }
+        
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; }
         .window-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .window-label { font-size: 14px; font-weight: 700; color: var(--text-main); margin: 0; }
@@ -82,7 +85,27 @@ BASE_HTML = """
         .pass-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: right; }
         .pass-opt-label { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .select-modern { width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background-color: #f8fafc; font-size: 15px; outline: none; }
+
+        /* 📱 חוקי ההתאמה המיוחדים למובייל (רספונסיביות) */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            .sidebar-header { padding: 20px; text-align: center; }
+            .sidebar-menu { flex-direction: row; padding: 10px; overflow-x: auto; white-space: nowrap; gap: 8px; -webkit-overflow-scrolling: touch; }
+            .sidebar a { padding: 10px 14px; font-size: 13px; display: inline-flex; }
+            .main-content { margin-right: 0; width: 100%; padding: 16px; }
+            .container { padding: 20px; border-radius: var(--radius-md); }
+            h1 { font-size: 22px; }
+            .description { font-size: 14px; margin-bottom: 20px; }
+            .workspace-grid { grid-template-columns: 1fr; gap: 15px; }
+            textarea { height: 160px; font-size: 15px; }
+            .action-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .btn-action { padding: 10px 4px; font-size: 12px; }
+            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
+            .pass-options { grid-template-columns: 1fr; gap: 10px; }
+        }
     </style>
+
 </head>
 <body>
 <div class="sidebar">
