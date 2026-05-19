@@ -24,17 +24,24 @@ BASE_HTML = """
         :root {
             --bg-main: #f8fafc; --bg-card: #ffffff; --bg-sidebar: #0f172a;
             --text-main: #1e293b; --text-muted: #64748b; --primary: #6366f1;
-            --radius-lg: 16px; --radius-md: 12px; --border: #e2e8f0;
+            --primary-hover: #4f46e5; --accent: #0ea5e9; --border: #e2e8f0;
+            --radius-lg: 16px; --radius-md: 12px;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
         body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; }
         .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; }
         .sidebar-header { padding: 25px; border-bottom: 1px solid #1e293b; }
         .sidebar-header h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(to left, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sidebar-menu { padding: 15px 12px; display: flex; flex-direction: column; gap: 4px; }
-        .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 12px 16px; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: var(--radius-md); transition: 0.2s; }
+        .sidebar-menu { padding: 15px 12px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; overflow-y: auto; }
+        .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); transition: 0.2s; }
         .sidebar a:hover, .sidebar a.active { background-color: #1e293b; color: #ffffff; }
         .sidebar a.active { background: linear-gradient(135deg, var(--primary), #0ea5e9); }
+        
+        /* אזור משוב קבוע בתחתית הסרגל */
+        .sidebar-footer { padding: 20px; border-top: 1px solid #1e293b; text-align: center; font-size: 12px; color: #64748b; }
+        .sidebar-footer a { color: var(--accent); text-decoration: none; font-weight: 600; display: inline-block; margin-top: 4px; }
+        .sidebar-footer a:hover { text-decoration: underline; }
+
         .main-content { margin-right: 280px; flex-grow: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; width: calc(100% - 280px); box-sizing: border-box; }
         .container { width: 100%; max-width: 850px; background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); box-sizing: border-box; }
         h1 { font-size: 26px; font-weight: 800; text-align: center; margin: 0 0 10px 0; }
@@ -50,14 +57,19 @@ BASE_HTML = """
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; }
         .window-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .mini-copy-btn { background: #f1f5f9; color: var(--primary); border: 1px solid var(--border); padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 4px; }
-        textarea { width: 100%; height: 200px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background-color: #f8fafc; line-height: 1.6; }
-        textarea:focus { border-color: var(--primary); background-color: #ffffff; outline: none; }
+        textarea, .input-modern { width: 100%; height: 200px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background-color: #f8fafc; line-height: 1.6; }
+        textarea:focus, .input-modern:focus { border-color: var(--primary); background-color: #ffffff; outline: none; }
+        .input-modern { height: auto; padding: 12px; margin-bottom: 15px; }
         .output-area { background-color: #fafafa; }
         .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
         .btn-action { background: #ffffff; color: var(--text-main); border: 1px solid var(--border); padding: 12px 4px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); }
         .btn-action.active { background-color: rgba(99, 102, 241, 0.08); border: 2px solid var(--primary); }
-        .file-dropzone { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: var(--radius-md); background-color: #f8fafc; text-align: center; cursor: pointer; }
-        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); width: 100%; margin-top: 15px; }
+        
+        .file-dropzone { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: var(--radius-md); background-color: #f8fafc; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .file-dropzone:hover { border-color: var(--primary); background-color: rgba(99, 102, 241, 0.02); }
+        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); width: 100%; margin-top: 5px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); transition: 0.2s; }
+        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25); }
+        
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
         .stat-card { background: #ffffff; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center; }
         .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); }
@@ -68,6 +80,7 @@ BASE_HTML = """
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: relative; }
             .sidebar-menu { flex-direction: row; padding: 10px; overflow-x: auto; gap: 8px; }
+            .sidebar-footer { display: none; }
             .main-content { margin-right: 0; width: 100%; padding: 16px; }
             .container { padding: 20px; }
             .tools-dashboard, .workspace-grid, .stats-grid, .pass-options { grid-template-columns: 1fr; }
@@ -84,6 +97,7 @@ BASE_HTML = """
         <div class="sidebar-menu">
             <a href="/" class="{% if current_page == 'dashboard' %}active{% endif %}">🏠 דף הבית</a>
             <a href="/inverter" class="{% if current_page == 'inverter' %}active{% endif %}">🔄 היפוך טקסט ומקלדת</a>
+            <a href="/whatsapp" class="{% if current_page == 'whatsapp' %}active{% endif %}">🟢 מחולל קישורי ווטסאפ</a>
             <a href="/nikud" class="{% if current_page == 'nikud' %}active{% endif %}">✍️ ניקוד אוטומטי</a>
             <a href="/cleaner" class="{% if current_page == 'cleaner' %}active{% endif %}">🧼 מנקה רווחים ושורות</a>
             <a href="/counter" class="{% if current_page == 'counter' %}active{% endif %}">📊 סופר מילים ותווים</a>
@@ -91,18 +105,23 @@ BASE_HTML = """
             <a href="/compress-img" class="{% if current_page == 'img' %}active{% endif %}">🖼️ כיווץ תמונות</a>
             <a href="/compress-pdf" class="{% if current_page == 'pdf' %}active{% endif %}">📄 כיווץ PDF</a>
         </div>
+        <!-- תיבת משוב חמודה בתחתית -->
+        <div class="sidebar-footer">
+            <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
+            <a href="mailto:support@toolhub.com">שלחו לנו משוב במייל</a>
+        </div>
     </div>
     <div class="main-content">
         <div class="ad-container">💰 אזור פרסום פרימיום עליון (Google AdSense)</div>
         <div class="container">
             <h1>{{ title }}</h1>
             <div class="description">{{ description }}</div>
-
             {% if current_page == 'dashboard' %}
                 <div class="tools-dashboard">
                     <a href="/inverter" class="tool-card"><div class="tool-icon">🔄</div><div class="tool-title">היפוך טקסט ומקלדת</div><div class="tool-desc">היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב.</div></a>
+                    <a href="/whatsapp" class="tool-card"><div class="tool-icon">🟢</div><div class="tool-title">מחולל קישורי ווטסאפ</div><div class="tool-desc">יצירת קישור ישיר לשיחת ווטסאפ עם הודעה מוכנה מראש בלייב.</div></a>
                     <a href="/nikud" class="tool-card"><div class="tool-icon">✍️</div><div class="tool-title">ניקוד טקסט אוטומטי</div><div class="tool-desc">הוספת ניקוד דקדוקי חכם למשפטים בעברית בלייב.</div></a>
-                    <a href="/cleaner" class="tool-card"><div class="tool-icon">🧼</div><div class="tool-title">Mנקה רווחים ושורות</div><div class="tool-desc">ניקוי רווחים כפולים ומחיקת שורות ריקות בקליק.</div></a>
+                    <a href="/cleaner" class="tool-card"><div class="tool-icon">🧼</div><div class="tool-title">מנקה רווחים ושורות</div><div class="tool-desc">ניקוי רווחים כפולים ומחיקת שורות ריקות בקליק.</div></a>
                     <a href="/counter" class="tool-card"><div class="tool-icon">📊</div><div class="tool-title">סופר מילים ותווים</div><div class="tool-desc">ניתוח סטטיסטי מדויק של אורך הטקסט בלייב.</div></a>
                     <a href="/password" class="tool-card"><div class="tool-icon">🔑</div><div class="tool-title">מחולל סיסמאות פרו</div><div class="tool-desc">יצירת סיסמאות חזקות עם שליטה מלאה באורך וסוג התווים.</div></a>
                     <a href="/compress-img" class="tool-card"><div class="tool-icon">🖼️</div><div class="tool-title">כיווץ תמונות מהיר</div><div class="tool-desc">הקטנת משקל קובצי תמונה ב-70% תוך שמירה על האיכות.</div></a>
@@ -145,9 +164,40 @@ BASE_HTML = """
                     }
                 </script>
 
+            {% elif current_page == 'whatsapp' %}
+                <!-- כלי חדש ומטורף: מחולל קישורי ווטסאפ בלייב -->
+                <div class="workspace-grid">
+                    <div>
+                        <label class="window-label">📱 מספר טלפון (כולל קידומת, למשל 0501234567):</label>
+                        <input type="text" id="waPhone" class="input-modern" placeholder="הכנס מספר טלפון..." oninput="processWhatsapp()">
+                        
+                        <label class="window-label">💬 הודעה מוכנה מראש (אופציונלי):</label>
+                        <textarea id="waMsg" style="height:120px;" placeholder="הדבק או הקלד את ההודעה שתפתח בשיחה..." oninput="processWhatsapp()"></textarea>
+                    </div>
+                    <div>
+                        <div class="window-header">
+                            <span class="window-label">🔗 הקישור המוכן שלך:</span>
+                            <button id="waCopyBtn" class="mini-copy-btn" onclick="copyResult('waDst', 'waCopyBtn')">📋 העתק קישור</button>
+                        </div>
+                        <textarea id="waDst" class="output-area" style="height:200px; font-family:monospace; font-size:14px; color:var(--primary);" placeholder="הקישור ייווצר כאן אוטומטית..." readonly></textarea>
+                    </div>
+                </div>
+                <script>
+                    function processWhatsapp() {
+                        let phone = document.getElementById('waPhone').value.trim();
+                        const msg = document.getElementById('waMsg').value;
+                        if (!phone) { document.getElementById('waDst').value = ""; return; }
+                        if (phone.startsWith('0')) { phone = '972' + phone.substring(1); }
+                        phone = phone.replace(/[^0-9]/g, '');
+                        let url = "https://wa.me" + phone;
+                        if (msg.trim()) { url += "?text=" + encodeURIComponent(msg); }
+                        document.getElementById('waDst').value = url;
+                    }
+                </script>
+
             {% elif current_page == 'nikud' %}
                 <div class="workspace-grid">
-                    <div><textarea id="nikudSrc" placeholder="הקלד כאן (למשל: יוסי אכל חסה למרות כל הבאסה)..." oninput="processNikud()"></textarea></div>
+                    <div><textarea id="nikudSrc" placeholder="הקלד כאן..." oninput="processNikud()"></textarea></div>
                     <div>
                         <div class="window-header">
                             <button id="nikudRefreshBtn" class="mini-copy-btn" style="color:#4f46e5;" onclick="processNikud(true)">🔄 רענן ונקד</button>
@@ -241,9 +291,21 @@ BASE_HTML = """
                 </script>
 
             {% elif current_page == 'img' %}
-                <form method="POST" action="/compress-img" enctype="multipart/form-data"><div class="file-dropzone" onclick="document.getElementById('img_file').click()"><input type="file" id="img_file" name="img_file" accept="image/*" required><div>📥 לחץ או גרור תמונה לכאן</div></div><input type="submit" class="submit-btn" value="🗜️ כווץ תמונה"></form>
+                <form method="POST" action="/compress-img" enctype="multipart/form-data">
+                    <div class="file-dropzone" onclick="document.getElementById('img_file').click()">
+                        <input type="file" id="img_file" name="img_file" accept="image/*" required onchange="document.getElementById('img-text').innerText = '📄 קובץ נבחר: ' + this.files.name; document.getElementById('img-text').style.color = '#16a34a';">
+                        <div id="img-text" style="font-weight:600; color:var(--text-muted);">📥 לחץ או גרור תמונה לכאן</div>
+                    </div>
+                    <input type="submit" class="submit-btn" value="🗜️ כווץ תמונה והורד">
+                </form>
             {% elif current_page == 'pdf' %}
-                <form method="POST" action="/compress-pdf" enctype="multipart/form-data"><div class="file-dropzone" onclick="document.getElementById('pdf_file').click()"><input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required><div>📥 לחץ או גרור PDF לכאן</div></div><input type="submit" class="submit-btn" value="🗜️ כווץ PDF"></form>
+                <form method="POST" action="/compress-pdf" enctype="multipart/form-data">
+                    <div class="file-dropzone" onclick="document.getElementById('pdf_file').click()">
+                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required onchange="document.getElementById('pdf-text').innerText = '📄 קובץ נבחר: ' + this.files.name; document.getElementById('pdf-text').style.color = '#16a34a';">
+                        <div id="pdf-text" style="font-weight:600; color:var(--text-muted);">📥 לחץ או גרור PDF לכאן</div>
+                    </div>
+                    <input type="submit" class="submit-btn" value="🗜️ התחל כיווץ והורד קובץ">
+                </form>
             {% endif %}
         </div>
         <script>
@@ -251,7 +313,7 @@ BASE_HTML = """
                 const dst = document.getElementById(textareaId); const btn = document.getElementById(buttonId);
                 if(dst.value) {
                     navigator.clipboard.writeText(dst.value); btn.innerText = "✨ הועתק!";
-                    setTimeout(() => { btn.innerText = buttonId.includes('pass') ? "📋 העתק" : "📋 העתק הכל"; }, 1500);
+                    setTimeout(() => { btn.innerText = buttonId.includes('pass') ? "📋 העתק" : buttonId.includes('wa') ? "📋 העתק קישור" : "📋 העתק הכל"; }, 1500);
                 }
             }
         </script>
@@ -265,6 +327,8 @@ BASE_HTML = """
 def home(): return render_template_string(BASE_HTML, title="🏠 ברוכים הבאים ל-ToolHub", description="בחר את הכלי המבוקש מתוך הרשימה למטה והתחל לעבוד במהירות ובחינם.", current_page="dashboard")
 @app.route("/inverter")
 def inverter(): return render_template_string(BASE_HTML, title="🔄 היפוך טקסט ומקלדת בלייב", description="הקלד בחלון הימני וקבל תוצאה מיידית.", current_page="inverter")
+@app.route("/whatsapp")
+def whatsapp(): return render_template_string(BASE_HTML, title="🟢 מחולל קישורי ווטסאפ מהיר", description="הזן מספר טלפון והודעה, וקבל קישור ישיר להעתקה מיידית ללא רענון עמוד.", current_page="whatsapp")
 @app.route("/nikud")
 def nikud_page(): return render_template_string(BASE_HTML, title="✍️ ניקוד טקסט אוטומטי בלייב", description="הדבק משפט בעברית וקבל אותו מנוקד באופן מיידי.", current_page="nikud")
 @app.route("/api/nikud", methods=["POST"])
@@ -278,26 +342,31 @@ def cleaner(): return render_template_string(BASE_HTML, title="🧼 מנקה ר�
 def counter(): return render_template_string(BASE_HTML, title="📊 סופר מילים ותווים בלייב", description="הזן טקסט וקבל נתונים סטטיסטיים בזמן אמת.", current_page="counter")
 @app.route("/password")
 def password(): return render_template_string(BASE_HTML, title="🔑 מחולל סיסמאות פרו בלייב", description="ייצר סיסמה מותאמת אישית.", current_page="password")
+
 @app.route("/compress-img", methods=["GET", "POST"])
 def compress_img():
     if request.method == "POST":
         file = request.files.get("img_file")
-        if file:
+        if file and file.filename != '':
             img = Image.open(file)
             if img.mode in ("RGBA", "P"): img = img.convert("RGB")
             out = io.BytesIO(); img.save(out, format="JPEG", quality=65, optimize=True); out.seek(0)
             return send_file(out, as_attachment=True, download_name="compressed_image.jpg", mimetype="image/jpeg")
-    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="הורד גרסה קלה ב-70% תוך שמירה מלאה על האיכות.", current_page="img")
+    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="הורד גרסה קלה ב-70% תוך שמירה מלאה על איכות.", current_page="img")
+
 @app.route("/compress-pdf", methods=["GET", "POST"])
 def compress_pdf():
     if request.method == "POST":
         file = request.files.get("pdf_file")
-        if file and file.filename.endswith('.pdf'):
-            input_pdf = PdfReader(file); writer = PdfWriter()
-            for page in input_pdf.pages: page.compress_content_streams(); writer.add_page(page)
-            out = io.BytesIO(); writer.write(out); out.seek(0)
-            return send_file(out, as_attachment=True, download_name=f"compressed_{file.filename}", mimetype="application/pdf")
-    return render_template_string(BASE_HTML, title="📄 כיווץ PDF מהיר לממשל זמין", description="כווץ קבצים כבדים לממשל זמין.", current_page="pdf")
+        if file and file.filename != '':
+            try:
+                input_pdf = PdfReader(file); writer = PdfWriter()
+                for page in input_pdf.pages: writer.add_page(page)
+                out = io.BytesIO(); writer.write(out); out.seek(0)
+                return send_file(out, as_attachment=True, download_name="compressed_document.pdf", mimetype="application/pdf")
+            except Exception as e:
+                return "אירעה שגיאה בעיבוד הקובץ. ודא שמדובר בקובץ PDF תקין.", 400
+    return render_template_string(BASE_HTML, title="📄 כיווץ PDF מהיר לממשל זמין", description="הקובץ כבד מדי לאתרים ממשלתיים? כווץ אותו כאן בקליק אחד.", current_page="pdf")
 
 if __name__ == "__main__":
     app.run(debug=True)
