@@ -21,68 +21,77 @@ BASE_HTML = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - ToolHub</title>
     <style>
+        /* 🔮 שילוב אפקט הזכוכית המטושטשת המנצח בכל האתר */
         :root {
-            --bg-main: #f8fafc; --bg-card: #ffffff; --bg-sidebar: #0f172a;
-            --text-main: #1e293b; --text-muted: #64748b; --primary: #6366f1;
-            --primary-hover: #4f46e5; --accent: #0ea5e9; --border: #e2e8f0;
-            --radius-lg: 16px; --radius-md: 12px;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #311042 100%);
+            --text-main: #f8fafc; --text-muted: #cbd5e1; --primary: #818cf8;
+            --primary-hover: #6366f1; --accent: #38bdf8; --radius-lg: 24px; --radius-md: 16px;
+            --glass-bg: rgba(255, 255, 255, 0.04);
+            --glass-sidebar: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(16px);
+            --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; }
-        .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; }
-        .sidebar-header { padding: 25px; border-bottom: 1px solid #1e293b; }
-        .sidebar-header h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(to left, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .sidebar-menu { padding: 15px 12px; display: flex; flex-direction: column; gap: 4px; flex-grow: 1; overflow-y: auto; }
-        .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 11px 16px; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); transition: 0.2s; }
-        .sidebar a:hover, .sidebar a.active { background-color: #1e293b; color: #ffffff; }
-        .sidebar a.active { background: linear-gradient(135deg, var(--primary), #0ea5e9); }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-gradient); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; background-attachment: fixed; }
         
-        /* אזור משוב קבוע בתחתית הסרגל */
-        .sidebar-footer { padding: 20px; border-top: 1px solid #1e293b; text-align: center; font-size: 12px; color: #64748b; }
+        .sidebar { width: 280px; background: var(--glass-sidebar); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); color: var(--text-main); height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.3); z-index: 10; border-left: 1px solid var(--glass-border); }
+        .sidebar-header { padding: 30px 24px; border-bottom: 1px solid var(--glass-border); }
+        .sidebar-header h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(to left, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sidebar-menu { padding: 20px 12px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1; overflow-y: auto; }
+        .sidebar a { display: flex; align-items: center; color: var(--text-muted); padding: 12px 16px; text-decoration: none; font-size: 14px; font-weight: 500; border-radius: var(--radius-md); transition: all 0.2s; border: 1px solid transparent; }
+        .sidebar a:hover { background: rgba(255,255,255,0.05); color: #ffffff; border-color: rgba(255,255,255,0.05); }
+        .sidebar a.active { background: rgba(255, 255, 255, 0.1); color: #ffffff; font-weight: 600; border-color: var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .sidebar-footer { padding: 24px; border-top: 1px solid var(--glass-border); text-align: center; font-size: 12px; color: #94a3b8; }
         .sidebar-footer a { color: var(--accent); text-decoration: none; font-weight: 600; display: inline-block; margin-top: 4px; }
-        .sidebar-footer a:hover { text-decoration: underline; }
-
-        .main-content { margin-right: 280px; flex-grow: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; width: calc(100% - 280px); box-sizing: border-box; }
-        .container { width: 100%; max-width: 850px; background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); box-sizing: border-box; }
-        h1 { font-size: 26px; font-weight: 800; text-align: center; margin: 0 0 10px 0; }
-        .description { color: var(--text-muted); text-align: center; margin-bottom: 30px; font-size: 15px; }
+        
+        .main-content { margin-right: 280px; flex-grow: 1; padding: 50px 40px; display: flex; flex-direction: column; align-items: center; width: calc(100% - 280px); box-sizing: border-box; }
+        .container { width: 100%; max-width: 850px; background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--glass-border); box-sizing: border-box; }
+        h1 { font-size: 28px; font-weight: 800; text-align: center; margin: 0 0 10px 0; color: #ffffff; }
+        .description { color: var(--text-muted); text-align: center; margin-bottom: 40px; font-size: 15px; }
         
         .tools-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; text-align: right; }
-        .tool-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-lg); text-decoration: none; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
-        .tool-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
-        .tool-icon { font-size: 28px; }
-        .tool-title { font-size: 17px; font-weight: 700; }
-        .tool-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+        .tool-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--glass-border); padding: 24px; border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; gap: 6px; }
+        .tool-card:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-4px); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2); }
+        .tool-icon { font-size: 28px; margin-bottom: 4px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); }
+        .tool-title { font-size: 17px; font-weight: 700; color: #ffffff; }
+        .tool-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
         
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; }
         .window-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .mini-copy-btn { background: #f1f5f9; color: var(--primary); border: 1px solid var(--border); padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 4px; }
-        textarea, .input-modern { width: 100%; height: 200px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background-color: #f8fafc; line-height: 1.6; }
-        textarea:focus, .input-modern:focus { border-color: var(--primary); background-color: #ffffff; outline: none; }
+        .mini-copy-btn { background: rgba(255,255,255,0.08); color: #ffffff; border: 1px solid var(--glass-border); padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        .mini-copy-btn:hover { background: var(--primary); border-color: var(--primary); }
+        textarea, .input-modern { width: 100%; height: 210px; padding: 16px; border: 1px solid var(--glass-border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background: rgba(0, 0, 0, 0.2); color: #ffffff; line-height: 1.6; }
+        textarea:focus, .input-modern:focus { border-color: var(--primary); box-shadow: 0 0 12px rgba(129, 140, 248, 0.2); outline: none; }
         .input-modern { height: auto; padding: 12px; margin-bottom: 15px; }
-        .output-area { background-color: #fafafa; }
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .btn-action { background: #ffffff; color: var(--text-main); border: 1px solid var(--border); padding: 12px 4px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); }
-        .btn-action.active { background-color: rgba(99, 102, 241, 0.08); border: 2px solid var(--primary); }
+        .output-area { background: rgba(255, 255, 255, 0.02); color: #f1f5f9; }
         
-        .file-dropzone { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: var(--radius-md); background-color: #f8fafc; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
-        .file-dropzone:hover { border-color: var(--primary); background-color: rgba(99, 102, 241, 0.02); }
-        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); width: 100%; margin-top: 5px; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15); transition: 0.2s; }
-        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25); }
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+        .btn-action { background: rgba(255,255,255,0.06); color: var(--text-main); border: 1px solid var(--glass-border); padding: 12px 4px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); transition: 0.2s; }
+        .btn-action.active { background: rgba(129, 140, 248, 0.2); border-color: var(--primary); box-shadow: 0 0 10px rgba(129, 140, 248, 0.2); }
+        
+        .file-dropzone { border: 2px dashed rgba(255,255,255,0.2); padding: 40px 20px; border-radius: var(--radius-md); background: rgba(0,0,0,0.2); text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .file-dropzone:hover { border-color: var(--primary); background: rgba(255,255,255,0.02); }
+        .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); width: 100%; margin-top: 5px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); transition: 0.2s; }
+        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
-        .stat-card { background: #ffffff; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center; }
-        .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); }
+        .stat-card { background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); text-align: center; }
+        .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); text-shadow: 0 0 8px rgba(129, 140, 248, 0.4); }
         .pass-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: right; }
-        .ad-container { background: #ffffff; border: 1px dashed #cbd5e1; padding: 15px; margin: 20px auto; width: 100%; max-width: 850px; color: var(--text-muted); font-size: 12px; border-radius: var(--radius-md); text-align: center; box-sizing: border-box; }
+        .pass-opt-label { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-muted); }
+        .select-modern { width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; font-size: 15px; outline: none; }
+        .select-modern option { background: #1e1b4b; color: white; }
+        .ad-container { background: rgba(0,0,0,0.2); border: 1px dashed var(--glass-border); padding: 15px; margin: 20px auto; width: 100%; max-width: 850px; color: var(--text-muted); font-size: 12px; border-radius: var(--radius-md); text-align: center; box-sizing: border-box; backdrop-filter: var(--glass-blur); }
+        .about-text { font-size: 16px; line-height: 1.8; text-align: right; color: var(--text-main); }
+        .about-card-badge { display: inline-block; background: rgba(129, 140, 248, 0.2); color: #a5b4fc; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 13px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; }
+            .sidebar { width: 100%; height: auto; position: relative; border-left: none; }
             .sidebar-menu { flex-direction: row; padding: 10px; overflow-x: auto; gap: 8px; }
             .sidebar-footer { display: none; }
-            .main-content { margin-right: 0; width: 100%; padding: 16px; }
-            .container { padding: 20px; }
+            .main-content { margin-right: 0; width: 100%; padding: 20px 16px; }
+            .container { padding: 25px 20px; }
             .tools-dashboard, .workspace-grid, .stats-grid, .pass-options { grid-template-columns: 1fr; }
             .action-grid { grid-template-columns: repeat(2, 1fr); }
         }
@@ -91,21 +100,21 @@ BASE_HTML = """
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <a href="/" style="text-decoration: none;"><h2 style="cursor: pointer;">🛠️ ToolHub</h2></a>
-            <div style="color: #94a3b8; font-size: 13px; font-weight: 600; margin-top: 4px;">ארגז הכלים שלך</div>
+            <a href="/" style="text-decoration: none;"><h2>🛠️ ToolHub</h2></a>
+            <div style="color: var(--text-muted); font-size: 13px; font-weight: 600; margin-top: 4px;">ארגז הכלים שלך</div>
         </div>
         <div class="sidebar-menu">
             <a href="/" class="{% if current_page == 'dashboard' %}active{% endif %}">🏠 דף הבית</a>
             <a href="/inverter" class="{% if current_page == 'inverter' %}active{% endif %}">🔄 היפוך טקסט ומקלדת</a>
-            <a href="/whatsapp" class="{% if current_page == 'whatsapp' %}active{% endif %}">🟢 מחולל קישורי ווטסאפ</a>
+            <a href="/compress-pdf" class="{% if current_page == 'pdf' %}active{% endif %}">📄 כיווץ PDF מהיר</a>
+            <a href="/compress-img" class="{% if current_page == 'img' %}active{% endif %}">🖼️ כיווץ תמונות מהיר</a>
+            <a href="/whatsapp" class="{% if current_page == 'whatsapp' %}active{% endif %}">🟢 מחולל קישורי וווטסאפ</a>
             <a href="/nikud" class="{% if current_page == 'nikud' %}active{% endif %}">✍️ ניקוד אוטומטי</a>
             <a href="/cleaner" class="{% if current_page == 'cleaner' %}active{% endif %}">🧼 מנקה רווחים ושורות</a>
             <a href="/counter" class="{% if current_page == 'counter' %}active{% endif %}">📊 סופר מילים ותווים</a>
             <a href="/password" class="{% if current_page == 'password' %}active{% endif %}">🔑 מחולל סיסמאות</a>
-            <a href="/compress-img" class="{% if current_page == 'img' %}active{% endif %}">🖼️ כיווץ תמונות</a>
-            <a href="/compress-pdf" class="{% if current_page == 'pdf' %}active{% endif %}">📄 כיווץ PDF</a>
+            <a href="/about" class="{% if current_page == 'about' %}active{% endif %}">ℹ️ אודות הפרויקט</a>
         </div>
-        <!-- תיבת משוב חמודה בתחתית -->
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
             <a href="mailto:support@toolhub.com">שלחו לנו משוב במייל</a>
@@ -119,15 +128,24 @@ BASE_HTML = """
             {% if current_page == 'dashboard' %}
                 <div class="tools-dashboard">
                     <a href="/inverter" class="tool-card"><div class="tool-icon">🔄</div><div class="tool-title">היפוך טקסט ומקלדת</div><div class="tool-desc">היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב.</div></a>
-                    <a href="/whatsapp" class="tool-card"><div class="tool-icon">🟢</div><div class="tool-title">מחולל קישורי ווטסאפ</div><div class="tool-desc">יצירת קישור ישיר לשיחת ווטסאפ עם הודעה מוכנה מראש בלייב.</div></a>
+                    <a href="/compress-pdf" class="tool-card"><div class="tool-icon">📄</div><div class="tool-title">כיווץ PDF לממשל זמין</div><div class="tool-desc">דחיסת קובצי PDF והתאמתם למגבלות המשקל של אתרי הממשלה.</div></a>
+                    <a href="/compress-img" class="tool-card"><div class="tool-icon">🖼️</div><div class="tool-title">כיווץ תמונות מהיר</div><div class="tool-desc">הקטנת משקל קובצי תמונה ב-70% תוך שמירה מלאה על האיכות.</div></a>
+                    <a href="/whatsapp" class="tool-card"><div class="tool-icon">🟢</div><div class="tool-title">מחולל קישורי וווטסאפ</div><div class="tool-desc">יצירת קישור ישיר לשיחת וווטסאפ עם הודעה מוכנה מראש בלייב.</div></a>
                     <a href="/nikud" class="tool-card"><div class="tool-icon">✍️</div><div class="tool-title">ניקוד טקסט אוטומטי</div><div class="tool-desc">הוספת ניקוד דקדוקי חכם למשפטים בעברית בלייב.</div></a>
                     <a href="/cleaner" class="tool-card"><div class="tool-icon">🧼</div><div class="tool-title">מנקה רווחים ושורות</div><div class="tool-desc">ניקוי רווחים כפולים ומחיקת שורות ריקות בקליק.</div></a>
                     <a href="/counter" class="tool-card"><div class="tool-icon">📊</div><div class="tool-title">סופר מילים ותווים</div><div class="tool-desc">ניתוח סטטיסטי מדויק של אורך הטקסט בלייב.</div></a>
                     <a href="/password" class="tool-card"><div class="tool-icon">🔑</div><div class="tool-title">מחולל סיסמאות פרו</div><div class="tool-desc">יצירת סיסמאות חזקות עם שליטה מלאה באורך וסוג התווים.</div></a>
-                    <a href="/compress-img" class="tool-card"><div class="tool-icon">🖼️</div><div class="tool-title">כיווץ תמונות מהיר</div><div class="tool-desc">הקטנת משקל קובצי תמונה ב-70% תוך שמירה על האיכות.</div></a>
-                    <a href="/compress-pdf" class="tool-card" style="grid-column: span 2;" id="pdfCard"><div class="tool-icon">📄</div><div class="tool-title">כיווץ PDF לממשל זמין</div><div class="tool-desc">דחיסת קובצי PDF והתאמתם למגבלות המשקל של אתרי הממשלה.</div></a>
                 </div>
-                <script>if(window.innerWidth <= 768) document.getElementById('pdfCard').style.gridColumn = "span 1";</script>
+
+            {% elif current_page == 'about' %}
+                <!-- דף אודות מעוצב ומרגש למטרת חסד -->
+                <div class="about-text">
+                    <div class="about-card-badge">❤️ פרויקט ללא מטרת רווח - לתועלת הציבור</div>
+                    <p>ברוכים הבאים ל-<strong>ToolHub</strong>! האתר הזה נולד מתוך רעיון פשוט: לתת לציבור בישראל ארגז כלים דיגיטלי מתקדם, מהיר ואיכותי - <strong>בחינם לחלוטין וללא צורך בהרשמה</strong>.</p>
+                    <p>כל הכלים באתר זה נבנו במטרה אחת: לעשות חסד, להקל על היום-יום שלכם ולחסוך לכם זמן יקר. בין אם אתם סטודנטים שמנסים להגיש טפסים לממשל זמין, בעלי עסקים שצריכים קישור מהיר לווטסאפ, או כותבי תוכן שזקוקים לניקוד או היפוך טקסט - אנחנו כאן בשבילכם.</p>
+                    <p><strong>למה יש פרסומות באתר?</strong><br>השירותים והכלים תמיד יישארו חינמיים ב-100%. הפרסומות באתר נועדו אך ורק כדי לעזור לנו לממן את עלויות השרתים החזקים שמריצים את עיבודי ה-PDF והתמונות, ולאפשר לנו להמשיך להחזיק את פרויקט החסד הזה באוויר עבור כולם.</p>
+                    <p style="text-align: center; font-weight: 700; margin-top: 30px; color: var(--accent);">תודה רבה על השימוש שלכם ועל התמיכה בפרויקט! 🙏</p>
+                </div>
 
             {% elif current_page == 'inverter' %}
                 <div class="workspace-grid">
@@ -142,8 +160,8 @@ BASE_HTML = """
                     <button id="btn-no_num" class="btn-action" onclick="setMode('no_num')">🔢 בלי מספרים</button>
                     <button id="btn-no_eng" class="btn-action" onclick="setMode('no_eng')">🔤 בלי אנגלית</button>
                     <button id="btn-lines" class="btn-action" onclick="setMode('lines')">📝 בתוך שורות</button>
-                    <button id="btn-eng2heb" class="btn-action" style="color:#16a34a;" onclick="setMode('eng2heb')">⌨️ אנגלית ⬅️ עברית</button>
-                    <button id="btn-heb2eng" class="btn-action" style="color:#dc2626;" onclick="setMode('heb2eng')">⌨️ עברית ⬅️ אנגלית</button>
+                    <button id="btn-eng2heb" class="btn-action" style="color:#38bdf8;" onclick="setMode('eng2heb')">⌨️ אנגלית ⬅️ עברית</button>
+                    <button id="btn-heb2eng" class="btn-action" style="color:#f43f5e;" onclick="setMode('heb2eng')">⌨️ עברית ⬅️ אנגלית</button>
                 </div>
                 <script>
                     let currentMode = 'full';
@@ -165,31 +183,27 @@ BASE_HTML = """
                 </script>
 
             {% elif current_page == 'whatsapp' %}
-                <!-- כלי חדש ומטורף: מחולל קישורי ווטסאפ בלייב -->
                 <div class="workspace-grid">
                     <div>
-                        <label class="window-label">📱 מספר טלפון (כולל קידומת, למשל 0501234567):</label>
+                        <label class="window-label">📱 מספר טלפון (למשל 0501234567):</label>
                         <input type="text" id="waPhone" class="input-modern" placeholder="הכנס מספר טלפון..." oninput="processWhatsapp()">
-                        
                         <label class="window-label">💬 הודעה מוכנה מראש (אופציונלי):</label>
-                        <textarea id="waMsg" style="height:120px;" placeholder="הדבק או הקלד את ההודעה שתפתח בשיחה..." oninput="processWhatsapp()"></textarea>
+                        <textarea id="waMsg" style="height:120px;" placeholder="הקלד את ההודעה שתפתח בשיחה..." oninput="processWhatsapp()"></textarea>
                     </div>
                     <div>
                         <div class="window-header">
                             <span class="window-label">🔗 הקישור המוכן שלך:</span>
                             <button id="waCopyBtn" class="mini-copy-btn" onclick="copyResult('waDst', 'waCopyBtn')">📋 העתק קישור</button>
                         </div>
-                        <textarea id="waDst" class="output-area" style="height:200px; font-family:monospace; font-size:14px; color:var(--primary);" placeholder="הקישור ייווצר כאן אוטומטית..." readonly></textarea>
+                        <textarea id="waDst" class="output-area" style="height:200px; font-family:monospace; font-size:14px; color:var(--accent);" placeholder="הקישור ייווצר כאן אוטומטית..." readonly></textarea>
                     </div>
                 </div>
                 <script>
                     function processWhatsapp() {
-                        let phone = document.getElementById('waPhone').value.trim();
-                        const msg = document.getElementById('waMsg').value;
+                        let phone = document.getElementById('waPhone').value.trim(); const msg = document.getElementById('waMsg').value;
                         if (!phone) { document.getElementById('waDst').value = ""; return; }
                         if (phone.startsWith('0')) { phone = '972' + phone.substring(1); }
-                        phone = phone.replace(/[^0-9]/g, '');
-                        let url = "https://wa.me" + phone;
+                        phone = phone.replace(/[^0-9]/g, ''); let url = "https://wa.me" + phone;
                         if (msg.trim()) { url += "?text=" + encodeURIComponent(msg); }
                         document.getElementById('waDst').value = url;
                     }
@@ -197,10 +211,10 @@ BASE_HTML = """
 
             {% elif current_page == 'nikud' %}
                 <div class="workspace-grid">
-                    <div><textarea id="nikudSrc" placeholder="הקלד כאן..." oninput="processNikud()"></textarea></div>
+                    <div><textarea id="nikudSrc" placeholder="הקלד כאן (למשל: יוסי אכל חסה למרות כל הבאסה)..." oninput="processNikud()"></textarea></div>
                     <div>
                         <div class="window-header">
-                            <button id="nikudRefreshBtn" class="mini-copy-btn" style="color:#4f46e5;" onclick="processNikud(true)">🔄 רענן ונקד</button>
+                            <button id="nikudRefreshBtn" class="mini-copy-btn" style="color:var(--primary);" onclick="processNikud(true)">🔄 רענן ונקד</button>
                             <button id="nikudCopyBtn" class="mini-copy-btn" onclick="copyResult('nikudDst', 'nikudCopyBtn')">📋 העתק הכל</button>
                         </div>
                         <textarea id="nikudDst" class="output-area" placeholder="התוצאה תופיע כאן..." readonly></textarea>
@@ -262,19 +276,19 @@ BASE_HTML = """
 
             {% elif current_page == 'password' %}
                 <div class="pass-options">
-                    <div><select id="pass-length" style="width:100%; padding:10px;" onchange="generatePasswordLive()"><option value="6">6 תווים</option><option value="8">8 תווים</option><option value="10" selected>10 תווים</option><option value="16">16 תווים</option></select></div>
+                    <div><select id="pass-length" class="select-modern" onchange="generatePasswordLive()"><option value="6">6 תווים</option><option value="8">8 תווים</option><option value="10" selected>10 תווים</option><option value="16">16 תווים</option></select></div>
                     <div style="display:flex; flex-direction:column; gap:5px;">
-                        <label><input type="checkbox" id="opt-letters" checked onchange="generatePasswordLive()"> אותיות</label>
-                        <label><input type="checkbox" id="opt-numbers" checked onchange="generatePasswordLive()"> מספרים</label>
-                        <label><input type="checkbox" id="opt-symbols" checked onchange="generatePasswordLive()"> מיוחדים</label>
+                        <label class="pass-opt-label"><input type="checkbox" id="opt-letters" checked onchange="generatePasswordLive()"> אותיות</label>
+                        <label class="pass-opt-label"><input type="checkbox" id="opt-numbers" checked onchange="generatePasswordLive()"> מספרים</label>
+                        <label class="pass-opt-label"><input type="checkbox" id="opt-symbols" checked onchange="generatePasswordLive()"> מיוחדים</label>
                     </div>
                 </div>
                 <div class="window-header">
                     <button id="passRefreshBtn" class="mini-copy-btn" onclick="generatePasswordLive()">🔄 אחרת</button>
                     <button id="passCopyBtn" class="mini-copy-btn" onclick="copyResult('passDst', 'passCopyBtn')">📋 העתק</button>
-                    <button class="mini-copy-btn" style="color:#0369a1;" onclick="downloadPassword()">💾 שמור קובץ</button>
+                    <button class="mini-copy-btn" style="color:var(--accent);" onclick="downloadPassword()">💾 שמור קובץ</button>
                 </div>
-                <textarea id="passDst" class="output-area" style="height:60px; text-align:center; font-family:monospace; font-size:22px;" readonly></textarea>
+                <textarea id="passDst" class="output-area" style="height:60px; text-align:center; font-family:monospace; font-size:22px; background:rgba(0,0,0,0.3);" readonly></textarea>
                 <script>
                     function generatePasswordLive() {
                         const length = parseInt(document.getElementById('pass-length').value);
@@ -293,7 +307,7 @@ BASE_HTML = """
             {% elif current_page == 'img' %}
                 <form method="POST" action="/compress-img" enctype="multipart/form-data">
                     <div class="file-dropzone" onclick="document.getElementById('img_file').click()">
-                        <input type="file" id="img_file" name="img_file" accept="image/*" required onchange="document.getElementById('img-text').innerText = '📄 קובץ נבחר: ' + this.files.name; document.getElementById('img-text').style.color = '#16a34a';">
+                        <input type="file" id="img_file" name="img_file" accept="image/*" required onchange="document.getElementById('img-text').innerText = '📄 קובץ נבחר: ' + this.files[name]; document.getElementById('img-text').style.color = '#38bdf8';">
                         <div id="img-text" style="font-weight:600; color:var(--text-muted);">📥 לחץ או גרור תמונה לכאן</div>
                     </div>
                     <input type="submit" class="submit-btn" value="🗜️ כווץ תמונה והורד">
@@ -301,7 +315,7 @@ BASE_HTML = """
             {% elif current_page == 'pdf' %}
                 <form method="POST" action="/compress-pdf" enctype="multipart/form-data">
                     <div class="file-dropzone" onclick="document.getElementById('pdf_file').click()">
-                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required onchange="document.getElementById('pdf-text').innerText = '📄 קובץ נבחר: ' + this.files.name; document.getElementById('pdf-text').style.color = '#16a34a';">
+                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required onchange="document.getElementById('pdf-text').innerText = '📄 קובץ נבחר: ' + this.files[name]; document.getElementById('pdf-text').style.color = '#38bdf8';">
                         <div id="pdf-text" style="font-weight:600; color:var(--text-muted);">📥 לחץ או גרור PDF לכאן</div>
                     </div>
                     <input type="submit" class="submit-btn" value="🗜️ התחל כיווץ והורד קובץ">
@@ -342,6 +356,8 @@ def cleaner(): return render_template_string(BASE_HTML, title="🧼 מנקה ר�
 def counter(): return render_template_string(BASE_HTML, title="📊 סופר מילים ותווים בלייב", description="הזן טקסט וקבל נתונים סטטיסטיים בזמן אמת.", current_page="counter")
 @app.route("/password")
 def password(): return render_template_string(BASE_HTML, title="🔑 מחולל סיסמאות פרו בלייב", description="ייצר סיסמה מותאמת אישית.", current_page="password")
+@app.route("/about")
+def about(): return render_template_string(BASE_HTML, title="ℹ️ אודות פרויקט ToolHub", description="הסיפור מאחורי ארגז הכלים הדיגיטלי שלנו שנבנה למטרת חסד ועזרה לציבור.", current_page="about")
 
 @app.route("/compress-img", methods=["GET", "POST"])
 def compress_img():
@@ -352,7 +368,7 @@ def compress_img():
             if img.mode in ("RGBA", "P"): img = img.convert("RGB")
             out = io.BytesIO(); img.save(out, format="JPEG", quality=65, optimize=True); out.seek(0)
             return send_file(out, as_attachment=True, download_name="compressed_image.jpg", mimetype="image/jpeg")
-    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="הורד גרסה קלה ב-70% תוך שמירה מלאה על איכות.", current_page="img")
+    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="הורד גרסה קלה ב-70% תוך שמירה מלאה על האיכות.", current_page="img")
 
 @app.route("/compress-pdf", methods=["GET", "POST"])
 def compress_pdf():
