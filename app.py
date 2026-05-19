@@ -16,7 +16,8 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 # ==========================================
 # הגדרות משתנים גלובליים
 # ==========================================
-PAYPAL_LINK = "https://www.paypal.me/YOUR_USERNAME"
+PAYPAL_LINK = "https://www.paypal.me/zarug"
+CONTACT_EMAIL = "zarug11@gmail.com"
 
 # לוגיקת ניקוד בסיסית פנימית כגיבוי (מיושן, מומלץ להחליף ב-API חיצוני)
 def get_internal_nikud(text):
@@ -25,7 +26,7 @@ def get_internal_nikud(text):
     lexicon = {
         "שלום": "👑 שָׁלוֹם", "וברכה": "וּבְרָכָה", "אני": "אֲנִי", "עושה": "עוֹשֶׂה",
         "ניסיון": "נִסָּיוֹן", "ואני": "וַאֲנִי", "רואה": "רוֹאֶה", "שזה": "שֶׁזֶּה",
-        "לא": "לֹא", "מצליח": "מַצְלִיחַ", "יוסי": "יוֹסִי", "הלך": "הָלַךְ",
+        "לא": "\u05dc\u05b9\u05d0", "מצליח": "מַצְלִיחַ", "יוסי": "יוֹסִי", "הלך": "הָלַךְ",
         "לטייל": "לְטַיֵּל", "ביער": "בַּיַּעַר", "חסה": "חָסָה", "למרות": "לַמְרוֹת",
         "כל": "כָּל", "הבאסה": "הַבָּאסָה", "שועל": "שׁוּעָל", "מהלך": "מְהַלֵּךְ",
         "בוקר": "בֹּקֶר", "טוב": "טוֹב", "ערב": "עֶרֶב", "אבא": "אַבָּא", "אמא": "אִמָּא"
@@ -610,7 +611,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="mailto:maor.computers@gmail.com">שלחו לנו משוב במייל</a>
+            <a href="mailto:{{ CONTACT_EMAIL }}">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
@@ -682,7 +683,7 @@ BASE_HTML = """
                     <div style="margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-md);">
                         <p style="font-weight: 700; font-size: 17px; margin-bottom: 10px; color: #ffffff;">☕ אהבתם את האתר? נשמח לתמיכה שלכם!</p>
                         <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">אם הכלים שלנו עזרו לכם וחסכו לכם זמן, אתם מוזמנים להביע הערכה ולתרום למימון המשך פיתוח השרתים:</p>
-                        <a href="{{ paypal_link }}" target="_blank" class="paypal-button">
+                        <a href="{{ PAYPAL_LINK }}" target="_blank" class="paypal-button">
                             <span>💙 תמיכה ותרומה מאובטחת באמצעות PayPal</span>
                         </a>
                     </div>
@@ -1141,6 +1142,21 @@ BASE_HTML = """
 
         </div>
     </div>
+    
+    <script>
+        // פונקציה כללית לעדכון תצוגת כמות קבצים שנבחרו
+        function updateFileCount(input, targetId) {
+            const count = input.files.length;
+            const target = document.getElementById(targetId);
+            if (count > 1) {
+                target.innerText = " 📂 " + count + " קבצים נבחרו ומוכנים!";
+            } else if (count === 1) {
+                target.innerText = " 📄 קובץ אחד נבחר ומוכן!";
+            } else {
+                target.innerText = "";
+            }
+        }
+    </script>
 </body>
 </html>
 """
@@ -1187,11 +1203,11 @@ def img_resize_page():
 
 @app.route('/img-effects')
 def img_effects_page():
-    return render_template_string(BASE_HTML, current_page='img-effects', title='🎨 פילטרים ואפקטים לתמונות', description='עצב את התמונה עם פילטרים: טשטוש, שחור-לבן, רישום וחדות. כולל תצוגה מקדימה והורדת JPEG.')
+    return render_template_string(BASE_HTML, current_page='img-effects', title='🎨 פילטרים ואפקטים לתמונות', description='עצב את התמונה WITH פילטרים: טשטוש, שחור-לבן, רישום וחדות. כולל תצוגה מקדימה והורדת JPEG.')
 
 @app.route('/about')
 def about():
-    return render_template_string(BASE_HTML, current_page='about', title='ℹ️ אודות הפרויקט', description='הכירו את הסיפור מאחורי ToolHub ומדוע הקמנו אותו.', paypal_link=PAYPAL_LINK)
+    return render_template_string(BASE_HTML, current_page='about', title='ℹ️ אודות הפרויקט', description='הכירו את הסיפור מאחורי ToolHub ומדוע הקמנו אותו.', PAYPAL_LINK=PAYPAL_LINK)
 
 # ==========================================
 # פעולות ועיבודי קצה (API Backends & Logic)
