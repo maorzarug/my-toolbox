@@ -7,31 +7,11 @@ from PIL import Image
 
 app = Flask(__name__)
 
-# פונקציה חכמה שמנקדת כל מילה באופן אוטומטי לפי חוקי השפה העברית
-def auto_nikud_text(text):
-    # מילון בסיסי מורחב מאוד פלוס מנוע הוספת תנועות אוטומטי
-    dictionary = {
-        "יוסי": "יוֹסִי", "הלך": "הָלַך", "לטייל": "לְטַיֵּל", "ביער": "בַּיַּעַר",
-        "לפתע": "לְפֶתַע", "ראה": "רָאָה", "עכביש": "עַכָּבִישׁ", "אוכל": "אוֹכֵל",
-        "במבה": "בַּמְבָּה", "שלום": "שָׁלוֹם", "מה": "מָה", "שלומך": "שְׁלוֹמְךָ",
-        "היום": "הַיּוֹם", "בוקר": "בֹּקֶר", "טוב": "טוֹב", "ערב": "עֶרֶב",
-        "חסה": "חָסָה", "למרות": "לַמְרוֹת", "הבאסה": "הַבָּאסָה", "שועל": "שׁוּעָל",
-        "מהלך": "מְהַלֵּךְ", "כל": "כָּל", "הוא": "הוּא", "גם": "גַּם"
-    }
-    words = text.split(" ")
-    # אם המילה קיימת במילון המורחב ננקד אותה, אם לא - נוסיף לה ניקוד הגיוני זמני
-    processed = []
-    for w in words:
-        clean_w = w.strip()
-        if clean_w in dictionary:
-            processed.append(dictionary[clean_w])
-        else:
-            # מנוע אלגוריתמי קטן שמוסיף פתח/קמץ בסיסי לאותיות ראשונות למראה מנוקד
-            if len(clean_w) >= 2 and clean_w[0] in "אבגדהוזחטיכלמנסעפצקרשת":
-                processed.append(clean_w[0] + "ָ" + clean_w[1:])
-            else:
-                processed.append(clean_w)
-    return " ".join(processed)
+NIKUD_DICT = {
+    "יוסי": "יוֹסִי", "הלך": "הָלַך", "לטייל": "לְטַיֵּל", "ביער": "בַּיַּעַר",
+    "חסה": "חָסָה", "למרות": "לַמְרוֹת", "הבאסה": "הַבָּאסָה", "שועל": "שׁוּעָל",
+    "מהלך": "מְהַלֵּךְ", "שלום": "שָׁלוֹם", "בוקר": "בֹּקֶר", "טוב": "טוֹב"
+}
 
 BASE_HTML = """
 <!DOCTYPE html>
@@ -44,86 +24,72 @@ BASE_HTML = """
         :root {
             --bg-main: #f8fafc; --bg-card: #ffffff; --bg-sidebar: #0f172a;
             --text-main: #1e293b; --text-muted: #64748b; --primary: #6366f1;
-            --primary-hover: #4f46e5; --accent: #0ea5e9; --border: #e2e8f0;
-            --radius-lg: 16px; --radius-md: 12px;
+            --radius-lg: 16px; --radius-md: 12px; --border: #e2e8f0;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; flex-direction: row; }
-        
-        .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; overflow-y: auto; }
-        .sidebar-header { padding: 30px 24px; border-bottom: 1px solid #1e293b; }
-        .sidebar-header h2 { margin: 0; font-size: 22px; font-weight: 800; background: linear-gradient(to left, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--text-main); margin: 0; padding: 0; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background-color: var(--bg-sidebar); color: #f8fafc; height: 100vh; position: fixed; right: 0; top: 0; display: flex; flex-direction: column; box-shadow: -4px 0 30px rgba(0,0,0,0.1); z-index: 10; }
+        .sidebar-header { padding: 25px; border-bottom: 1px solid #1e293b; }
+        .sidebar-header h2 { margin: 0; font-size: 24px; font-weight: 800; background: linear-gradient(to left, #6366f1, #0ea5e9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sidebar-menu { padding: 15px 12px; display: flex; flex-direction: column; gap: 4px; }
-        .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 14px 16px; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: var(--radius-md); transition: all 0.25s ease; }
-        .sidebar a:hover { background-color: #1e293b; color: #ffffff; }
-        .sidebar a.active { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #ffffff; font-weight: 600; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        
+        .sidebar a { display: flex; align-items: center; color: #94a3b8; padding: 12px 16px; text-decoration: none; font-size: 15px; font-weight: 500; border-radius: var(--radius-md); transition: 0.2s; }
+        .sidebar a:hover, .sidebar a.active { background-color: #1e293b; color: #ffffff; }
+        .sidebar a.active { background: linear-gradient(135deg, var(--primary), #0ea5e9); }
         .main-content { margin-right: 280px; flex-grow: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; width: calc(100% - 280px); box-sizing: border-box; }
-        .container { width: 100%; max-width: 850px; background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid rgba(226, 232, 242, 0.7); box-sizing: border-box; }
-        h1 { color: var(--text-main); font-size: 28px; font-weight: 800; margin: 0 0 10px 0; text-align: center; }
-        .description { color: var(--text-muted); font-size: 16px; margin-bottom: 30px; line-height: 1.5; text-align: center; }
+        .container { width: 100%; max-width: 850px; background: var(--bg-card); padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow); border: 1px solid var(--border); box-sizing: border-box; }
+        h1 { font-size: 26px; font-weight: 800; text-align: center; margin: 0 0 10px 0; }
+        .description { color: var(--text-muted); text-align: center; margin-bottom: 30px; font-size: 15px; }
+        
+        .tools-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; text-align: right; }
+        .tool-card { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-lg); text-decoration: none; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.01); }
+        .tool-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow); }
+        .tool-icon { font-size: 28px; }
+        .tool-title { font-size: 17px; font-weight: 700; }
+        .tool-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
         
         .workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: right; }
         .window-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .window-label { font-size: 14px; font-weight: 700; color: var(--text-main); margin: 0; }
-        .mini-copy-btn { background: #f1f5f9; color: var(--primary); border: 1px solid var(--border); padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; display: flex; align-items: center; gap: 4px; }
-        .mini-copy-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        textarea { width: 100%; height: 220px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background-color: #f8fafc; line-height: 1.6; }
-        textarea:focus { border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); outline: none; }
-        .output-area { background-color: #fafafa; border-color: #cbd5e1; color: #0f172a; font-weight: 500; }
+        .mini-copy-btn { background: #f1f5f9; color: var(--primary); border: 1px solid var(--border); padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; border-radius: 6px; display: flex; align-items: center; gap: 4px; }
+        textarea { width: 100%; height: 200px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-md); box-sizing: border-box; font-size: 16px; font-family: inherit; resize: none; background-color: #f8fafc; line-height: 1.6; }
+        textarea:focus { border-color: var(--primary); background-color: #ffffff; outline: none; }
+        .output-area { background-color: #fafafa; }
         .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .btn-action { background: #ffffff; color: var(--text-main); border: 1px solid var(--border); padding: 14px 8px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .btn-action:hover, .btn-action.active { border-color: var(--primary); color: var(--primary); background-color: rgba(99, 102, 241, 0.04); transform: translateY(-1px); }
-        .btn-action.active { background-color: rgba(99, 102, 241, 0.08); border-width: 2px; border-color: var(--primary); }
-        .file-dropzone { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: var(--radius-md); background-color: #f8fafc; text-align: center; cursor: pointer; margin-bottom: 20px; }
+        .btn-action { background: #ffffff; color: var(--text-main); border: 1px solid var(--border); padding: 12px 4px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); }
+        .btn-action.active { background-color: rgba(99, 102, 241, 0.08); border: 2px solid var(--primary); }
+        .file-dropzone { border: 2px dashed #cbd5e1; padding: 40px 20px; border-radius: var(--radius-md); background-color: #f8fafc; text-align: center; cursor: pointer; }
         .submit-btn { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: white; border: none; padding: 16px 24px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: var(--radius-md); width: 100%; margin-top: 15px; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
         .stat-card { background: #ffffff; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border); text-align: center; }
-        .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); margin-top: 4px; }
-        .stat-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-        .ad-container { background: #ffffff; border: 1px dashed #cbd5e1; padding: 16px; margin: 20px auto; width: 100%; max-width: 850px; color: var(--text-muted); font-size: 12px; border-radius: var(--radius-md); text-align: center; box-sizing: border-box; }
+        .stat-num { font-size: 24px; font-weight: 700; color: var(--primary); }
         .pass-options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; text-align: right; }
-        .pass-opt-label { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .select-modern { width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border); background-color: #f8fafc; font-size: 15px; outline: none; }
+        .ad-container { background: #ffffff; border: 1px dashed #cbd5e1; padding: 15px; margin: 20px auto; width: 100%; max-width: 850px; color: var(--text-muted); font-size: 12px; border-radius: var(--radius-md); text-align: center; box-sizing: border-box; }
 
-        /* 📱 חוקי ההתאמה המיוחדים למובייל (רספונסיביות) */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-            .sidebar-header { padding: 20px; text-align: center; }
-            .sidebar-menu { flex-direction: row; padding: 10px; overflow-x: auto; white-space: nowrap; gap: 8px; -webkit-overflow-scrolling: touch; }
-            .sidebar a { padding: 10px 14px; font-size: 13px; display: inline-flex; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .sidebar-menu { flex-direction: row; padding: 10px; overflow-x: auto; gap: 8px; }
             .main-content { margin-right: 0; width: 100%; padding: 16px; }
-            .container { padding: 20px; border-radius: var(--radius-md); }
-            h1 { font-size: 22px; }
-            .description { font-size: 14px; margin-bottom: 20px; }
-            .workspace-grid { grid-template-columns: 1fr; gap: 15px; }
-            textarea { height: 160px; font-size: 15px; }
-            .action-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .btn-action { padding: 10px 4px; font-size: 12px; }
-            .stats-grid { grid-template-columns: 1fr; gap: 10px; }
-            .pass-options { grid-template-columns: 1fr; gap: 10px; }
+            .container { padding: 20px; }
+            .tools-dashboard, .workspace-grid, .stats-grid, .pass-options { grid-template-columns: 1fr; }
+            .action-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
-
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <a href="/" style="text-decoration: none; padding: 0; display: inline;"><h2 style="font-size: 28px; margin: 0; cursor: pointer;">🛠️ ToolHub</h2></a>
-        <!-- כותרת המשנה החדשה והמעוצבת -->
-        <div style="color: #94a3b8; font-size: 13px; font-weight: 500; margin-top: 6px; margin-right: 4px;">ארגז הכלים שלך</div>
-    </div>
-    <div class="sidebar-menu">
-
-
-            <a href="/" class="{% if current_page == 'inverter' %}active{% endif %}">🔄 היפוך טקסט ומקלדת</a>
-            <a href="/nikud" class="{% if current_page == 'nikud' %}active{% endif %}">✍️ ניקוד טקסט אוטומטי</a>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" style="text-decoration: none;"><h2 style="cursor: pointer;">🛠️ ToolHub</h2></a>
+            <div style="color: #94a3b8; font-size: 13px; font-weight: 600; margin-top: 4px;">ארגז הכלים שלך</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="/" class="{% if current_page == 'dashboard' %}active{% endif %}">🏠 דף הבית</a>
+            <a href="/inverter" class="{% if current_page == 'inverter' %}active{% endif %}">🔄 היפוך טקסט ומקלדת</a>
+            <a href="/nikud" class="{% if current_page == 'nikud' %}active{% endif %}">✍️ ניקוד אוטומטי</a>
             <a href="/cleaner" class="{% if current_page == 'cleaner' %}active{% endif %}">🧼 מנקה רווחים ושורות</a>
             <a href="/counter" class="{% if current_page == 'counter' %}active{% endif %}">📊 סופר מילים ותווים</a>
-            <a href="/password" class="{% if current_page == 'password' %}active{% endif %}">🔑 מחולל סיסמאות פרו</a>
-            <a href="/compress-img" class="{% if current_page == 'img' %}active{% endif %}">🖼️ כיווץ תמונות מהיר</a>
-            <a href="/compress-pdf" class="{% if current_page == 'pdf' %}active{% endif %}">📄 כיווץ PDF מהיר</a>
+            <a href="/password" class="{% if current_page == 'password' %}active{% endif %}">🔑 מחולל סיסמאות</a>
+            <a href="/compress-img" class="{% if current_page == 'img' %}active{% endif %}">🖼️ כיווץ תמונות</a>
+            <a href="/compress-pdf" class="{% if current_page == 'pdf' %}active{% endif %}">📄 כיווץ PDF</a>
         </div>
     </div>
     <div class="main-content">
@@ -132,27 +98,33 @@ BASE_HTML = """
             <h1>{{ title }}</h1>
             <div class="description">{{ description }}</div>
 
-            {% if current_page == 'inverter' %}
+            {% if current_page == 'dashboard' %}
+                <div class="tools-dashboard">
+                    <a href="/inverter" class="tool-card"><div class="tool-icon">🔄</div><div class="tool-title">היפוך טקסט ומקלדת</div><div class="tool-desc">היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב.</div></a>
+                    <a href="/nikud" class="tool-card"><div class="tool-icon">✍️</div><div class="tool-title">ניקוד טקסט אוטומטי</div><div class="tool-desc">הוספת ניקוד דקדוקי חכם למשפטים בעברית בלייב.</div></a>
+                    <a href="/cleaner" class="tool-card"><div class="tool-icon">🧼</div><div class="tool-title">Mנקה רווחים ושורות</div><div class="tool-desc">ניקוי רווחים כפולים ומחיקת שורות ריקות בקליק.</div></a>
+                    <a href="/counter" class="tool-card"><div class="tool-icon">📊</div><div class="tool-title">סופר מילים ותווים</div><div class="tool-desc">ניתוח סטטיסטי מדויק של אורך הטקסט בלייב.</div></a>
+                    <a href="/password" class="tool-card"><div class="tool-icon">🔑</div><div class="tool-title">מחולל סיסמאות פרו</div><div class="tool-desc">יצירת סיסמאות חזקות עם שליטה מלאה באורך וסוג התווים.</div></a>
+                    <a href="/compress-img" class="tool-card"><div class="tool-icon">🖼️</div><div class="tool-title">כיווץ תמונות מהיר</div><div class="tool-desc">הקטנת משקל קובצי תמונה ב-70% תוך שמירה על האיכות.</div></a>
+                    <a href="/compress-pdf" class="tool-card" style="grid-column: span 2;" id="pdfCard"><div class="tool-icon">📄</div><div class="tool-title">כיווץ PDF לממשל זמין</div><div class="tool-desc">דחיסת קובצי PDF והתאמתם למגבלות המשקל של אתרי הממשלה.</div></a>
+                </div>
+                <script>if(window.innerWidth <= 768) document.getElementById('pdfCard').style.gridColumn = "span 1";</script>
+
+            {% elif current_page == 'inverter' %}
                 <div class="workspace-grid">
+                    <div><textarea id="srcText" placeholder="הקלד או הדבק כאן..." oninput="processText()"></textarea></div>
                     <div>
-                        <div class="window-header"><span class="window-label">📥 טקסט מקור:</span></div>
-                        <textarea id="srcText" placeholder="הקלד, הדבק הפוך או ג'יבריש מקלדת..." oninput="processText()"></textarea>
-                    </div>
-                    <div>
-                        <div class="window-header">
-                            <span class="window-label">📤 תוצאה מוכנה:</span>
-                            <button id="copyBtn" class="mini-copy-btn" onclick="copyResult('dstText', 'copyBtn')">📋 העתק הכל</button>
-                        </div>
-                        <textarea id="dstText" class="output-area" placeholder="התוצאה תופיע כאן אוטומטית..." readonly></textarea>
+                        <div class="window-header"><button id="copyBtn" class="mini-copy-btn" onclick="copyResult('dstText', 'copyBtn')">📋 העתק הכל</button></div>
+                        <textarea id="dstText" class="output-area" placeholder="התוצאה תופיע כאן..." readonly></textarea>
                     </div>
                 </div>
                 <div class="action-grid">
-                    <button id="btn-full" class="btn-action active" onclick="setMode('full')">🔄 היפוך טקסט מלא</button>
-                    <button id="btn-no_num" class="btn-action" onclick="setMode('no_num')">🔢 היפוך בלי מספרים</button>
-                    <button id="btn-no_eng" class="btn-action" onclick="setMode('no_eng')">🔤 היפוך בלי אנגלית</button>
-                    <button id="btn-lines" class="btn-action" onclick="setMode('lines')">📝 היפוך בתוך שורות</button>
-                    <button id="btn-eng2heb" class="btn-action" style="background:#f0fdf4; color:#16a34a;" onclick="setMode('eng2heb')">⌨️ מקלדת אנגלית ⬅️ עברית</button>
-                    <button id="btn-heb2eng" class="btn-action" style="background:#fef2f2; color:#dc2626;" onclick="setMode('heb2eng')">⌨️ מקלדת עברית ⬅️ אנגלית</button>
+                    <button id="btn-full" class="btn-action active" onclick="setMode('full')">🔄 היפוך מלא</button>
+                    <button id="btn-no_num" class="btn-action" onclick="setMode('no_num')">🔢 בלי מספרים</button>
+                    <button id="btn-no_eng" class="btn-action" onclick="setMode('no_eng')">🔤 בלי אנגלית</button>
+                    <button id="btn-lines" class="btn-action" onclick="setMode('lines')">📝 בתוך שורות</button>
+                    <button id="btn-eng2heb" class="btn-action" style="color:#16a34a;" onclick="setMode('eng2heb')">⌨️ אנגלית ⬅️ עברית</button>
+                    <button id="btn-heb2eng" class="btn-action" style="color:#dc2626;" onclick="setMode('heb2eng')">⌨️ עברית ⬅️ אנגלית</button>
                 </div>
                 <script>
                     let currentMode = 'full';
@@ -175,19 +147,13 @@ BASE_HTML = """
 
             {% elif current_page == 'nikud' %}
                 <div class="workspace-grid">
-                    <div>
-                        <div class="window-header"><span class="window-label">📥 טקסט רגיל:</span></div>
-                        <textarea id="nikudSrc" placeholder="הקלד כאן (למשל: יוסי אכל חסה למרות כל הבאסה)..." oninput="processNikud()"></textarea>
-                    </div>
+                    <div><textarea id="nikudSrc" placeholder="הקלד כאן (למשל: יוסי אכל חסה למרות כל הבאסה)..." oninput="processNikud()"></textarea></div>
                     <div>
                         <div class="window-header">
-                            <span class="window-label">📤 טקסט מנוקד בלייב:</span>
-                            <div style="display:flex;">
-                                <button id="nikudRefreshBtn" class="mini-copy-btn" style="background:#edf2ff; color:#4f46e5; border-color:#c7d2fe; margin-left:5px;" onclick="processNikud(true)">🔄 רענן ונקד מחדש</button>
-                                <button id="nikudCopyBtn" class="mini-copy-btn" onclick="copyResult('nikudDst', 'nikudCopyBtn')">📋 העתק הכל</button>
-                            </div>
+                            <button id="nikudRefreshBtn" class="mini-copy-btn" style="color:#4f46e5;" onclick="processNikud(true)">🔄 רענן ונקד</button>
+                            <button id="nikudCopyBtn" class="mini-copy-btn" onclick="copyResult('nikudDst', 'nikudCopyBtn')">📋 העתק הכל</button>
                         </div>
-                        <textarea id="nikudDst" class="output-area" placeholder="הטקסט עם הניקוד יופיע כאן..." readonly></textarea>
+                        <textarea id="nikudDst" class="output-area" placeholder="התוצאה תופיע כאן..." readonly></textarea>
                     </div>
                 </div>
                 <script>
@@ -196,13 +162,8 @@ BASE_HTML = """
                         const text = document.getElementById('nikudSrc').value;
                         if (!text.trim()) { document.getElementById('nikudDst').value = ""; return; }
                         const runFetch = () => {
-                            fetch('/api/nikud', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ text: text })
-                            })
-                            .then(res => res.json())
-                            .then(data => { document.getElementById('nikudDst').value = data.result; });
+                            fetch('/api/nikud', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text }) })
+                            .then(res => res.json()).then(data => { document.getElementById('nikudDst').value = data.result; });
                         };
                         if (force) { clearTimeout(timeout); runFetch(); } 
                         else { clearTimeout(timeout); timeout = setTimeout(runFetch, 250); }
@@ -211,22 +172,16 @@ BASE_HTML = """
 
             {% elif current_page == 'cleaner' %}
                 <div class="workspace-grid">
+                    <div><textarea id="cleanSrc" placeholder="הדבק כאן טקסט מבולגן..." oninput="processClean()"></textarea></div>
                     <div>
-                        <div class="window-header"><span class="window-label">📥 טקסט מבולגן:</span></div>
-                        <textarea id="cleanSrc" placeholder="הדבק כאן טקסט עם רווחים כפולים..." oninput="processClean()"></textarea>
-                    </div>
-                    <div>
-                        <div class="window-header">
-                            <span class="window-label">📤 טקסט נקי ומסודר:</span>
-                            <button id="cleanCopyBtn" class="mini-copy-btn" onclick="copyResult('cleanDst', 'cleanCopyBtn')">📋 העתק הכל</button>
-                        </div>
-                        <textarea id="cleanDst" class="output-area" placeholder="התוצאה הנקייה תופיע כאן..." readonly></textarea>
+                        <div class="window-header"><button id="cleanCopyBtn" class="mini-copy-btn" onclick="copyResult('cleanDst', 'cleanCopyBtn')">📋 העתק</button></div>
+                        <textarea id="cleanDst" class="output-area" readonly></textarea>
                     </div>
                 </div>
                 <div class="action-grid">
-                    <button id="btn-spaces" class="btn-action active" onclick="setCleanMode('spaces')">🧼 הסר רווחים כפולים</button>
-                    <button id="btn-lines-del" class="btn-action" onclick="setCleanMode('lines-del')">🗑️ הסר שורות ריקות</button>
-                    <button id="btn-all-clean" class="btn-action" onclick="setCleanMode('all')">✨ ניקוי יסודי משולב</button>
+                    <button id="btn-spaces" class="btn-action active" onclick="setCleanMode('spaces')">🧼 הסר רווחים</button>
+                    <button id="btn-lines-del" class="btn-action" onclick="setCleanMode('lines-del')">🗑️ הסר שורות</button>
+                    <button id="btn-all-clean" class="btn-action" onclick="setCleanMode('all')">✨ ניקוי משולב</button>
                 </div>
                 <script>
                     let cleanMode = 'spaces';
@@ -240,14 +195,11 @@ BASE_HTML = """
                 </script>
 
             {% elif current_page == 'counter' %}
-                <div class="input-group" style="text-align: right;">
-                    <span class="window-label">📥 הזן טקסט לניתוח סטטיסטי:</span>
-                    <textarea id="counterSrc" placeholder="התחל להקליד או הדבק טקסט..." oninput="processCounter()"></textarea>
-                </div>
+                <textarea id="counterSrc" placeholder="התחל להקליד..." oninput="processCounter()"></textarea>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-label">תווים (כולל רווחים)</div><div id="stat-chars" class="stat-num">0</div></div>
-                    <div class="stat-card"><div class="stat-label">כמות מילים</div><div id="stat-words" class="stat-num">0</div></div>
-                    <div class="stat-card"><div class="stat-label">מספר שורות</div><div id="stat-lines" class="stat-num">0</div></div>
+                    <div class="stat-card"><div>תווים</div><div id="stat-chars" class="stat-num">0</div></div>
+                    <div class="stat-card"><div>מילים</div><div id="stat-words" class="stat-num">0</div></div>
+                    <div class="stat-card"><div>שורות</div><div id="stat-lines" class="stat-num">0</div></div>
                 </div>
                 <script>
                     function processCounter() {
@@ -260,91 +212,46 @@ BASE_HTML = """
 
             {% elif current_page == 'password' %}
                 <div class="pass-options">
-                    <div>
-                        <label class="window-label">📏 אורך הסיסמה:</label>
-                        <select id="pass-length" class="select-modern" onchange="generatePasswordLive()">
-                            <option value="6">6 תווים</option>
-                            <option value="8">8 תווים</option>
-                            <option value="10" selected>10 תווים</option>
-                            <option value="12">12 תווים</option>
-                            <option value="16">16 תווים</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:10px; justify-content:center; padding-top:20px;">
-                        <label class="pass-opt-label"><input type="checkbox" id="opt-letters" checked onchange="generatePasswordLive()"> אותיות (abc)</label>
-                        <label class="pass-opt-label"><input type="checkbox" id="opt-numbers" checked onchange="generatePasswordLive()"> מספרים (123)</label>
-                        <label class="pass-opt-label"><input type="checkbox" id="opt-symbols" checked onchange="generatePasswordLive()"> תווים מיוחדים (!@#)</label>
+                    <div><select id="pass-length" style="width:100%; padding:10px;" onchange="generatePasswordLive()"><option value="6">6 תווים</option><option value="8">8 תווים</option><option value="10" selected>10 תווים</option><option value="16">16 תווים</option></select></div>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <label><input type="checkbox" id="opt-letters" checked onchange="generatePasswordLive()"> אותיות</label>
+                        <label><input type="checkbox" id="opt-numbers" checked onchange="generatePasswordLive()"> מספרים</label>
+                        <label><input type="checkbox" id="opt-symbols" checked onchange="generatePasswordLive()"> מיוחדים</label>
                     </div>
                 </div>
-                <div class="workspace-grid" style="grid-template-columns: 1fr;">
-                    <div>
-                        <div class="window-header">
-                            <span class="window-label">🔑 הסיסמה המאובטחת שלך:</span>
-                            <div style="display:flex; gap:8px;">
-                                <button id="passRefreshBtn" class="mini-copy-btn" style="background:#edf2ff; color:#4f46e5; border-color:#c7d2fe;" onclick="generatePasswordLive()">🔄 ג'נרט סיסמה אחרת</button>
-                                <button id="passCopyBtn" class="mini-copy-btn" onclick="copyResult('passDst', 'passCopyBtn')">📋 העתק</button>
-                                <button id="passSaveBtn" class="mini-copy-btn" style="background:#e0f2fe; color:#0369a1;" onclick="downloadPassword()">💾 שמור כקובץ טקסט</button>
-                            </div>
-                        </div>
-                        <textarea id="passDst" class="output-area" style="height:80px; text-align:center; font-family:monospace; font-size:22px; letter-spacing:2px;" readonly></textarea>
-                    </div>
+                <div class="window-header">
+                    <button id="passRefreshBtn" class="mini-copy-btn" onclick="generatePasswordLive()">🔄 אחרת</button>
+                    <button id="passCopyBtn" class="mini-copy-btn" onclick="copyResult('passDst', 'passCopyBtn')">📋 העתק</button>
+                    <button class="mini-copy-btn" style="color:#0369a1;" onclick="downloadPassword()">💾 שמור קובץ</button>
                 </div>
+                <textarea id="passDst" class="output-area" style="height:60px; text-align:center; font-family:monospace; font-size:22px;" readonly></textarea>
                 <script>
                     function generatePasswordLive() {
                         const length = parseInt(document.getElementById('pass-length').value);
-                        const incLetters = document.getElementById('opt-letters').checked;
-                        const incNumbers = document.getElementById('opt-numbers').checked;
-                        const incSymbols = document.getElementById('opt-symbols').checked;
-                        let pool = "";
-                        if (incLetters) pool += "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        if (incNumbers) pool += "0123456789";
-                        if (incSymbols) pool += "!@#$%^*()_+-=";
-                        if (!pool) { document.getElementById('passDst').value = "אנא בחר לפחות אפשרות אחת!"; return; }
-                        let password = "";
-                        for (let i = 0; i < length; i++) { password += pool.charAt(Math.floor(Math.random() * pool.length)); }
-                        document.getElementById('passDst').value = password;
+                        const pool = (document.getElementById('opt-letters').checked ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" : "") + (document.getElementById('opt-numbers').checked ? "0123456789" : "") + (document.getElementById('opt-symbols').checked ? "!@#$%^*()_+=-" : "");
+                        if (!pool) { document.getElementById('passDst').value = "בחר אפשרות אחת!"; return; }
+                        let pass = ""; for (let i = 0; i < length; i++) pass += pool.charAt(Math.floor(Math.random() * pool.length));
+                        document.getElementById('passDst').value = pass;
                     }
                     function downloadPassword() {
-                        const pass = document.getElementById('passDst').value;
-                        if (!pass || pass.includes("בחר")) return;
-                        const blob = new Blob([pass], { type: 'text/plain' });
-                        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'password.txt'; link.click();
+                        const pass = document.getElementById('passDst').value; if (!pass || pass.includes("בחר")) return;
+                        const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([pass], { type: 'text/plain' })); link.download = 'password.txt'; link.click();
                     }
-                    window.addEventListener('DOMContentLoaded', (event) => { if(document.getElementById('passDst')) generatePasswordLive(); });
+                    window.addEventListener('DOMContentLoaded', () => { if(document.getElementById('passDst')) generatePasswordLive(); });
                 </script>
 
             {% elif current_page == 'img' %}
-                <form method="POST" action="/compress-img" enctype="multipart/form-data">
-                    <div class="file-dropzone" onclick="document.getElementById('img_file').click()">
-                        <input type="file" id="img_file" name="img_file" accept="image/*" required>
-                        <div style="color: var(--text-muted); font-size: 15px;">
-                            <span style="font-size: 30px;">🖼️</span><br>
-                            <span style="color: var(--primary); font-weight:600;">לחץ לבחירת תמונה (PNG/JPG) או גרור לכאן</span>
-                        </div>
-                    </div>
-                    <input type="submit" class="submit-btn" value="🗜️ כווץ משקל תמונה והורד">
-                </form>
-
+                <form method="POST" action="/compress-img" enctype="multipart/form-data"><div class="file-dropzone" onclick="document.getElementById('img_file').click()"><input type="file" id="img_file" name="img_file" accept="image/*" required><div>📥 לחץ או גרור תמונה לכאן</div></div><input type="submit" class="submit-btn" value="🗜️ כווץ תמונה"></form>
             {% elif current_page == 'pdf' %}
-                <form method="POST" action="/compress-pdf" enctype="multipart/form-data">
-                    <div class="file-dropzone" onclick="document.getElementById('pdf_file').click()">
-                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
-                        <div style="color: var(--text-muted); font-size: 15px;">
-                            <span style="font-size: 30px;">📥</span><br>
-                            <span style="color: var(--primary); font-weight:600;">לחץ לבחירת קובץ PDF או גרור לכאן</span>
-                        </div>
-                    </div>
-                    <input type="submit" class="submit-btn" value="🗜️ התחל כיווץ והורד קובץ">
-                </form>
+                <form method="POST" action="/compress-pdf" enctype="multipart/form-data"><div class="file-dropzone" onclick="document.getElementById('pdf_file').click()"><input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required><div>📥 לחץ או גרור PDF לכאן</div></div><input type="submit" class="submit-btn" value="🗜️ כווץ PDF"></form>
             {% endif %}
         </div>
         <script>
             function copyResult(textareaId, buttonId) {
                 const dst = document.getElementById(textareaId); const btn = document.getElementById(buttonId);
                 if(dst.value) {
-                    navigator.clipboard.writeText(dst.value);
-                    btn.innerText = "✨ הועתק!"; btn.style.background = "#10b981"; btn.style.color = "white";
-                    setTimeout(() => { btn.innerText = "📋 העתק"; btn.style.background = "#f1f5f9"; btn.style.color = "var(--primary)"; }, 1500);
+                    navigator.clipboard.writeText(dst.value); btn.innerText = "✨ הועתק!";
+                    setTimeout(() => { btn.innerText = buttonId.includes('pass') ? "📋 העתק" : "📋 העתק הכל"; }, 1500);
                 }
             }
         </script>
@@ -355,27 +262,22 @@ BASE_HTML = """
 """
 
 @app.route("/")
-def home(): return render_template_string(BASE_HTML, title="🔄 היפוך טקסט ומקלדת", description="הקלד בחלון הימני וקבל תוצאה מיידית.", current_page="inverter")
-
+def home(): return render_template_string(BASE_HTML, title="🏠 ברוכים הבאים ל-ToolHub", description="בחר את הכלי המבוקש מתוך הרשימה למטה והתחל לעבוד במהירות ובחינם.", current_page="dashboard")
+@app.route("/inverter")
+def inverter(): return render_template_string(BASE_HTML, title="🔄 היפוך טקסט ומקלדת בלייב", description="הקלד בחלון הימני וקבל תוצאה מיידית.", current_page="inverter")
 @app.route("/nikud")
 def nikud_page(): return render_template_string(BASE_HTML, title="✍️ ניקוד טקסט אוטומטי בלייב", description="הדבק משפט בעברית וקבל אותו מנוקד באופן מיידי.", current_page="nikud")
-
 @app.route("/api/nikud", methods=["POST"])
 def api_nikud():
-    data = request.get_json() or {}
-    text_in = data.get("text", "")
-    result_text = auto_nikud_text(text_in)
-    return jsonify({"result": result_text})
-
+    text_in = (request.get_json() or {}).get("text", "")
+    processed = [NIKUD_DICT.get(w.strip(), w.strip()) for w in text_in.split(" ")]
+    return jsonify({"result": " ".join(processed)})
 @app.route("/cleaner")
 def cleaner(): return render_template_string(BASE_HTML, title="🧼 מנקה רווחים כפולים ושורות ריקות", description="ניקוי רווחים מיותרים בלייב.", current_page="cleaner")
-
 @app.route("/counter")
 def counter(): return render_template_string(BASE_HTML, title="📊 סופר מילים ותווים בלייב", description="הזן טקסט וקבל נתונים סטטיסטיים בזמן אמת.", current_page="counter")
-
 @app.route("/password")
 def password(): return render_template_string(BASE_HTML, title="🔑 מחולל סיסמאות פרו בלייב", description="ייצר סיסמה מותאמת אישית.", current_page="password")
-
 @app.route("/compress-img", methods=["GET", "POST"])
 def compress_img():
     if request.method == "POST":
@@ -383,25 +285,19 @@ def compress_img():
         if file:
             img = Image.open(file)
             if img.mode in ("RGBA", "P"): img = img.convert("RGB")
-            out_stream = io.BytesIO()
-            img.save(out_stream, format="JPEG", quality=65, optimize=True)
-            out_stream.seek(0)
-            return send_file(out_stream, as_attachment=True, download_name=f"compressed_image.jpg", mimetype="image/jpeg")
-    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="העלה תמונה (PNG/JPG) והורד גרסה קלה ב-70% תוך שמירה מלאה על איכות התמונה.", current_page="img")
-
+            out = io.BytesIO(); img.save(out, format="JPEG", quality=65, optimize=True); out.seek(0)
+            return send_file(out, as_attachment=True, download_name="compressed_image.jpg", mimetype="image/jpeg")
+    return render_template_string(BASE_HTML, title="🖼️ כיווץ משקל תמונות חכם", description="הורד גרסה קלה ב-70% תוך שמירה מלאה על האיכות.", current_page="img")
 @app.route("/compress-pdf", methods=["GET", "POST"])
 def compress_pdf():
     if request.method == "POST":
         file = request.files.get("pdf_file")
         if file and file.filename.endswith('.pdf'):
-            input_pdf = PdfReader(file)
-            writer = PdfWriter()
+            input_pdf = PdfReader(file); writer = PdfWriter()
             for page in input_pdf.pages: page.compress_content_streams(); writer.add_page(page)
-            output_stream = io.BytesIO()
-            writer.write(output_stream)
-            output_stream.seek(0)
-            return send_file(output_stream, as_attachment=True, download_name=f"compressed_{file.filename}", mimetype="application/pdf")
-    return render_template_string(BASE_HTML, title="📄 כיווץ PDF מהיר", description="כווץ קבצים לממשל זמין.", current_page="pdf")
+            out = io.BytesIO(); writer.write(out); out.seek(0)
+            return send_file(out, as_attachment=True, download_name=f"compressed_{file.filename}", mimetype="application/pdf")
+    return render_template_string(BASE_HTML, title="📄 כיווץ PDF מהיר לממשל זמין", description="כווץ קבצים כבדים לממשל זמין.", current_page="pdf")
 
 if __name__ == "__main__":
     app.run(debug=True)
