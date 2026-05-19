@@ -17,7 +17,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 # הגדרות משתנים גלובליים
 # ==========================================
 PAYPAL_LINK = "https://www.paypal.me/zarug"
-CONTACT_EMAIL = "zarug11@gmail.com"
+CONTACT_EMAIL = "maor.zarug@gmail.com"
 
 # לוגיקת ניקוד בסיסית פנימית כגיבוי (מיושן, מומלץ להחליף ב-API חיצוני)
 def get_internal_nikud(text):
