@@ -611,7 +611,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="mailto:{{ CONTACT_EMAIL }}">שלחו לנו משוב במייל</a>
+            <a href="mailto:maor.zarug@gmail.com">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
