@@ -610,7 +610,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="mailto:support@toolhub.com">שלחו לנו משוב במייל</a>
+            <a href="mailto:maor.computers@gmail.com">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
