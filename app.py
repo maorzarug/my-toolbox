@@ -17,7 +17,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 # הגדרות משתנים גלובליים
 # ==========================================
 PAYPAL_LINK = "https://www.paypal.me/zarug"
-CONTACT_EMAIL = "maor.computers@gmail.com"
+CONTACT_EMAIL = "maor.zarug@gmail.com"
 
 # לוגיקת ניקוד בסיסית פנימית כגיבוי (מיושן, מומלץ להחליף ב-API חיצוני)
 def get_internal_nikud(text):
@@ -62,7 +62,29 @@ BASE_HTML = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - ToolHub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#818cf8">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- Open Graph (link preview: WhatsApp, Telegram, Facebook, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ToolHub">
+    <meta property="og:title" content="{{ title }} - ToolHub">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:image" content="{{ request.host_url }}icon.png">
+    <meta property="og:locale" content="he_IL">
+    <meta name="description" content="{{ description }}">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ title }} - ToolHub">
+    <meta name="twitter:description" content="{{ description }}">
+    <meta name="twitter:image" content="{{ request.host_url }}icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821768397488065"
      crossorigin="anonymous"></script>
     <style>
@@ -87,7 +109,7 @@ BASE_HTML = """
         }
 
         body {
-            font-family: 'Assistant', system-ui, -apple-system, sans-serif;
+            font-family: 'Noto Sans Hebrew', system-ui, -apple-system, sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
             margin: 0;
@@ -114,6 +136,7 @@ BASE_HTML = """
             box-shadow: -4px 0 30px rgba(0,0,0,0.3);
             z-index: 10;
             border-left: 1px solid var(--glass-border);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-header {
@@ -542,63 +565,203 @@ BASE_HTML = """
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* רספונסיביות למובייל */
+        /* ===== Mobile Top Bar ===== */
+        .mobile-topbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.97);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            z-index: 15;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .mobile-brand {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(to left, #818cf8, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .hamburger-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            touch-action: manipulation;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .hamburger-btn:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* ===== Sidebar Backdrop (mobile overlay) ===== */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-backdrop.open { display: block; }
+
+        /* ===== Sidebar Close Button (mobile) ===== */
+        .sidebar-close-btn {
+            display: none;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .sidebar-close-btn:hover { background: rgba(255, 255, 255, 0.12); }
+
+        /* ===== Responsive Mobile ===== */
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
+            .mobile-topbar { display: flex; }
+            .sidebar-close-btn { display: flex; }
 
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-left: none;
-                border-bottom: 1px solid var(--glass-border);
+                transform: translateX(110%);
+                z-index: 20;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
             }
 
             .sidebar-header {
-                padding: 20px;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 16px;
             }
 
             .sidebar-menu {
-                flex-direction: row;
-                padding: 10px;
-                overflow-x: auto;
-                gap: 8px;
-                white-space: nowrap;
+                flex-direction: column;
+                padding: 12px;
+                overflow-y: auto;
+                gap: 4px;
+                white-space: normal;
+            }
+
+            .sidebar a {
+                font-size: 15px;
+                padding: 14px 16px;
+                min-height: 48px;
             }
 
             .sidebar-footer {
-                display: none;
+                display: block;
             }
 
             .main-content {
                 margin-right: 0;
                 width: 100%;
-                padding: 20px 16px;
+                padding: 76px 16px 32px 16px;
             }
 
             .container {
-                padding: 25px 20px;
+                padding: 24px 16px;
             }
+
+            h1 { font-size: 22px; }
+
+            .description { font-size: 14px; margin-bottom: 28px; }
 
             .tools-dashboard {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
+
+            .tool-card { padding: 20px 16px; }
 
             .workspace-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
             }
+
+            textarea, .input-modern {
+                font-size: 16px;
+            }
+
+            .submit-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .action-grid { gap: 8px; }
+
+            .btn-action {
+                padding: 12px 14px;
+                font-size: 13px;
+                min-height: 44px;
+                touch-action: manipulation;
+            }
+
+            .file-dropzone { padding: 30px 16px; }
+
+            .paypal-button { font-size: 15px; padding: 13px 22px; }
+        }
+
+        @media (max-width: 480px) {
+            .mobile-topbar { padding: 0 12px; }
+            .main-content { padding: 72px 12px 28px 12px; }
+            .container { padding: 20px 14px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
+    <!-- Mobile Top Bar -->
+    <div class="mobile-topbar">
+        <a href="/" class="mobile-brand">🛠️ ToolHub</a>
+        <button class="hamburger-btn" id="hamburgerBtn" aria-label="פתח תפריט">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="sidebar" id="mainSidebar">
         <div class="sidebar-header">
-            <a href="/" style="text-decoration: none;"><h2>🛠️ ToolHub</h2></a>
-            <div style="color: var(--text-muted); font-size: 13px; font-weight: 600; margin-top: 4px;">ארגז הכלים שלך</div>
+            <div>
+                <a href="/" style="text-decoration: none;"><h2>🛠️ ToolHub</h2></a>
+                <div style="color: var(--text-muted); font-size: 13px; font-weight: 600; margin-top: 4px;">ארגז הכלים שלך</div>
+            </div>
+            <button class="sidebar-close-btn" id="sidebarClose" aria-label="סגור תפריט">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
         </div>
         <div class="sidebar-menu">
             <a href="/" class="{% if current_page == 'dashboard' %}active{% endif %}">🏠 דף הבית</a>
@@ -615,7 +778,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="https://mail.google.com/mail/?view=cm&to=maor.computers@gmail.com&su=ToolHub" target="_blank" style="cursor: pointer; pointer-events: auto;">שלחו לנו משוב במייל</a>
+            <a href="https://mail.google.com/mail/?view=cm&to=maor.zarug@gmail.com&su=ToolHub" target="_blank" style="cursor: pointer; pointer-events: auto;">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
@@ -1160,6 +1323,39 @@ BASE_HTML = """
                 target.innerText = "";
             }
         }
+
+        // ===== Hamburger Menu =====
+        (function() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const sidebar = document.getElementById('mainSidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+
+            function openSidebar() {
+                sidebar.classList.add('open');
+                backdrop.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+            if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+            if (backdrop) backdrop.addEventListener('click', closeSidebar);
+
+            // Close on nav link tap (mobile)
+            if (sidebar) {
+                sidebar.querySelectorAll('a').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) closeSidebar();
+                    });
+                });
+            }
+        })();
     </script>
 </body>
 </html>
@@ -1179,6 +1375,70 @@ def inverter():
 @app.route('/ads.txt')
 def ads_txt():
     return "google.com, pub-9821768397488065, DIRECT, f08c47fec0942fa0", 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+@app.route('/manifest.json')
+def manifest():
+    data = {
+        "name": "ToolHub - ארגז הכלים שלך",
+        "short_name": "ToolHub",
+        "description": "כלים דיגיטליים מתקדמים - ניקוד עברית, היפוך טקסט, כלי PDF ותמונות - בחינם לחלוטין",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#0f172a",
+        "theme_color": "#818cf8",
+        "lang": "he",
+        "dir": "rtl",
+        "icons": [
+            {"src": "/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+        ]
+    }
+    return app.response_class(
+        response=json.dumps(data, ensure_ascii=False),
+        status=200,
+        mimetype='application/manifest+json'
+    )
+
+@app.route('/icon.png')
+def app_icon():
+    static_icon = os.path.join(os.path.dirname(__file__), 'icon.png')
+    if os.path.exists(static_icon):
+        return send_file(static_icon, mimetype='image/png')
+    size = 512
+    img = Image.new('RGB', (size, size), '#0f172a')
+    draw = ImageDraw.Draw(img)
+
+    # Background rounded rect (simulate with ellipse corners via rectangle)
+    radius = size // 5
+    draw.rounded_rectangle([0, 0, size - 1, size - 1], radius=radius, fill='#1e1b4b')
+
+    # Purple glow circle
+    cx, cy = size // 2, size // 2
+    r = size * 11 // 32
+    draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill='#4f46e5')
+
+    # Inner lighter circle
+    r2 = size * 8 // 32
+    draw.ellipse([cx - r2, cy - r2, cx + r2, cy + r2], fill='#818cf8')
+
+    # Draw "T" letter centered
+    font_size = size // 3
+    try:
+        font = ImageFont.truetype("arialbd.ttf", font_size)
+    except Exception:
+        try:
+            font = ImageFont.truetype("arial.ttf", font_size)
+        except Exception:
+            font = ImageFont.load_default()
+
+    text = "T"
+    bbox = draw.textbbox((0, 0), text, font=font)
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    draw.text((cx - tw // 2, cy - th // 2 - size // 40), text, fill='#ffffff', font=font)
+
+    out = io.BytesIO()
+    img.save(out, format='PNG', optimize=True)
+    out.seek(0)
+    return send_file(out, mimetype='image/png')
 
 @app.route('/whatsapp')
 def whatsapp():
