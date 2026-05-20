@@ -63,6 +63,8 @@ BASE_HTML = """
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }} - ToolHub</title>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821768397488065"
+     crossorigin="anonymous"></script>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #311042 100%);
@@ -184,16 +186,18 @@ BASE_HTML = """
         }
 
         /* תוכן מרכזי */
-        .main-content {
-            margin-right: 280px;
-            flex-grow: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: calc(100% - 280px);
-            box-sizing: border-box;
-        }
+        /* תוכן מרכזי - תיקון שמונע בריחה של העיצוב הצידה */
+.main-content {
+    margin-right: 280px; /* השטח שהתפריט תופס */
+    flex-grow: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: calc(100% - 280px); /* מוודא שהרוחב לא עובר את קצה המסך */
+    box-sizing: border-box;    /* הכי חשוב: זה מונע מה-padding להוסיף רוחב */
+    min-height: 100vh;
+}
 
         .container {
             width: 100%;
@@ -611,7 +615,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="mailto:maor.zarug@gmail.com?subject=משוב מאתר הכלים">שלחו לנו משוב במייל</a>
+            <a href="mailto:maor.zarug@gmail.com" style="cursor: pointer; pointer-events: auto;">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
