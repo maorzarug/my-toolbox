@@ -17,7 +17,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 # הגדרות משתנים גלובליים
 # ==========================================
 PAYPAL_LINK = "https://www.paypal.me/zarug"
-CONTACT_EMAIL = "maor.zarug@gmail.com"
+CONTACT_EMAIL = "maor.computers@gmail.com"
 
 # לוגיקת ניקוד בסיסית פנימית כגיבוי (מיושן, מומלץ להחליף ב-API חיצוני)
 def get_internal_nikud(text):
@@ -615,7 +615,7 @@ BASE_HTML = """
         </div>
         <div class="sidebar-footer">
             <span>💡 מצאתם באג? יש לכם רעיון?</span><br>
-            <a href="mailto:maor.zarug@gmail.com" style="cursor: pointer; pointer-events: auto;">שלחו לנו משוב במייל</a>
+            <a href="https://mail.google.com/mail/?view=cm&to=maor.computers@gmail.com&su=ToolHub" target="_blank" style="cursor: pointer; pointer-events: auto;">שלחו לנו משוב במייל</a>
         </div>
     </div>
 
