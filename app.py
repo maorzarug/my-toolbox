@@ -1178,7 +1178,7 @@ def inverter():
     return render_template_string(BASE_HTML, current_page='inverter', title='🔄 היפוך טקסט ומקלדת', description='הפוך טקסטים, תקן בעיות כיווניות של עברית/אנגלית או תקן שורות הפוכות בלייב.')
 @app.route('/ads.txt')
 def ads_txt():
-    return "google.com, pub-9821768397488065, DIRECT, f08c47fec0942fa0", 200, {'Content-Type': 'text/plain'}
+    return "google.com, pub-9821768397488065, DIRECT, f08c47fec0942fa0", 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 @app.route('/whatsapp')
 def whatsapp():
