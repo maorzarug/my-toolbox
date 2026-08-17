@@ -1,0 +1,19 @@
+{
+  "admin_password": "admin",
+  "top_ad": {
+    "enabled": true,
+    "type": "custom",
+    "image_url": "https://example.com/top_banner.png",
+    "link_url": "https://example.com",
+    "alt_text": "באנר ראשי",
+    "html_code": ""
+  },
+  "bottom_ad": {
+    "enabled": true,
+    "type": "custom",
+    "image_url": "https://example.com/bottom_banner.png",
+    "link_url": "https://example.com/shop",
+    "alt_text": "באנר תחתון",
+    "html_code": ""
+  }
+}

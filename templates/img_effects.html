@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form id="effectForm" style="text-align: right;">
+    <label class="window-label">🎨 בחר תמונה להחלת פילטרים מתקדמים:</label>
+    <div class="file-dropzone" onclick="document.getElementById('imgEffFile').click()">
+        <div style="font-size: 36px; margin-bottom: 10px;">🎨</div>
+        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת תמונה לעיבוד</div>
+        <input type="file" id="imgEffFile" name="file" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+        <div id="fileCountEff" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+    </div>
+    
+    <label class="window-label">🎯 בחר אפקט או פילטר אמנותי:</label>
+    <select id="effectSelect" name="effect" class="input-modern" style="background-color: #1e1b4b; border-radius: var(--radius-sm); color:#fff; height: 45px;">
+        <option value="grayscale">📷 שחור לבן קלאסי (Grayscale)</option>
+        <option value="blur">🌫️ אפקט טשטוש עדין (Blur)</option>
+        <option value="contour">✏️ רישום קווי מתאר (Contour Sketch)</option>
+        <option value="brighten">☀️ הגברת בהירות וצבע (Brighten)</option>
+        <option value="sharpen">🔍 הגברת חדות פרטים (Sharpen)</option>
+    </select>
+    
+    <button type="button" id="applyEffBtn" class="submit-btn" onclick="applyEffectAndPreview()">⚡ החל אפקט והצג תצוגה מקדימה</button>
+    
+    <div id="previewContainer">
+        <label class="window-label" style="display: block; margin-top: 10px;">👀 תצוגה מקדימה (JPEG):</label>
+        <img id="imagePreview" src="" alt="תצוגה מקדימה של האפקט">
+        <br>
+        <button type="button" class="btn-action" style="background: var(--success); margin-top: 15px; width: auto;" onclick="downloadProcessedImage()">💾 הורד תמונה סופית (JPEG)</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/img-effects.js"></script>
+{% endblock %}

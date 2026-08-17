@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="line-height: 1.8; color: var(--text-muted); font-size: 15px; text-align: right;">
+    <p>ברוכים הבאים ל-<strong>ToolHub</strong> – ארגז הכלים הדיגיטלי המוביל ברשת לעבודה יעילה, נוחה ומהירה.</p>
+    <p>האתר נבנה מתוך מטרה לספק פתרונות חינמיים, איכותיים ונגישים לצרכים יומיומיים: ניקוד עברית, היפוך טקסטים, דחיסת מסמכי PDF לאתרים ממשלתיים, המרת תמונות ועוד – והכל במקום אחד, במהירות שיא וללא צורך בהתקנת תוכנות.</p>
+    <div style="margin-top: 30px; padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-md); text-align: center;">
+        <h3 style="margin-top: 0; color: #fff;">☕ אהבתם את האתר? רוצים לתמוך בהמשך הפיתוח?</h3>
+        <p style="font-size: 14px; margin-bottom: 20px;">התרומה שלכם עוזרת לנו לשמור על השרתים פעילים ולפתח כלים חינמיים חדשים עבור כולם.</p>
+        <a href="{{ PAYPAL_LINK }}" target="_blank" class="btn-action" style="background: linear-gradient(135deg, #0070ba, #003087); color: white; border: none; padding: 12px 24px; display: inline-block; font-size: 15px; font-weight: 700; text-decoration: none;">
+            💙 תמיכה בפרויקט באמצעות PayPal
+        </a>
+    </div>
+</div>
+{% endblock %}

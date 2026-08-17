@@ -1,0 +1,19 @@
+{
+  "name": "ToolHub - ארגז הכלים שלך",
+  "short_name": "ToolHub",
+  "description": "כלים דיגיטליים מתקדמים - ניקוד עברית, היפוך טקסט, כלי PDF ותמונות - בחינם לחלוטין",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#818cf8",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="workspace-grid">
+    <div>
+        <div class="window-header"><span class="window-label">✍️ הטקסט המקורי שלך:</span></div>
+        <textarea id="srcText" placeholder="הקלד או הדבק כאן את הטקסט..." oninput="processText()"></textarea>
+    </div>
+    <div>
+        <div class="window-header">
+            <span class="window-label">📋 התוצאה המעובדת:</span>
+            <button id="copyBtn" class="mini-copy-btn" onclick="copyResult('dstText', 'copyBtn')">📋 העתק הכל</button>
+        </div>
+        <textarea id="dstText" class="output-area" placeholder="התוצאה המעובדת תופיע כאן אוטומטית..." readonly></textarea>
+    </div>
+</div>
+<div class="action-grid">
+    <button id="btn-full" class="btn-action active" onclick="setMode('full')">🔄 היפוך מלא</button>
+    <button id="btn-lines" class="btn-action" onclick="setMode('lines')">📝 בתוך שורות</button>
+    <button id="btn-no_num" class="btn-action" onclick="setMode('no_num')">🔢 בלי מספרים</button>
+    <button id="btn-no_eng" class="btn-action" onclick="setMode('no_eng')">🔤 בלי אנגלית</button>
+    <button id="btn-eng2heb" class="btn-action" style="color: var(--accent);" onclick="setMode('eng2heb')">⌨️ אנגלית ⬅️ עברית</button>
+    <button id="btn-heb2eng" class="btn-action" style="color: var(--danger);" onclick="setMode('heb2eng')">⌨️ עברית ⬅️ אנגלית</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/inverter.js"></script>
+{% endblock %}

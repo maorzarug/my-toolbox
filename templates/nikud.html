@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="workspace-grid">
+    <div>
+        <div class="window-header"><span class="window-label">✍️ הקלד משפט חופשי בעברית:</span></div>
+        <textarea id="nikudSrc" placeholder="הקלד כאן כל משפט חופשי בעברית..." oninput="processNikud()"></textarea>
+    </div>
+    <div>
+        <div class="window-header">
+            <span class="window-label">💡 לחץ על אות לתיקון הניקוד הידני:</span>
+            <button id="nikudCopyBtn" class="mini-copy-btn" onclick="copyInteractiveText()">📋 העתק הכל</button>
+        </div>
+        <div id="nikudDst" class="output-area interactive-output" style="height: 250px; border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 16px; background: rgba(0, 0, 0, 0.2);"></div>
+    </div>
+</div>
+
+<div id="nikudPopupMenu" class="nikud-menu">
+    <button onclick="applyNikud('')">❌ ללא</button>
+    <button onclick="applyNikud('\u05B8')">ָ קמץ</button>
+    <button onclick="applyNikud('\u05B7')">ַ פתח</button>
+    <button onclick="applyNikud('\u05B5')">ֵ צירה</button>
+    <button onclick="applyNikud('\u05B6')">ֶ סגול</button>
+    <button onclick="applyNikud('\u05B4')">ִ חיריק</button>
+    <button onclick="applyNikud('\u05B9')">ֹ חולם</button>
+    <button onclick="applyNikud('\u05BB')">ֻ קובוץ</button>
+    <button onclick="applyNikud('\u05B0')">ְ שווא</button>
+    <button onclick="applyNikud('\u05BC')">ּ דגש</button>
+    <button onclick="applyNikud('\u05C1')">ׁ שין ימנית</button>
+    <button onclick="applyNikud('\u05C2')">ׂ שין שמאלית</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/nikud.js"></script>
+{% endblock %}

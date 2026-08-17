@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/action/pdf-compress" method="POST" enctype="multipart/form-data" style="text-align: right;">
+    <label class="window-label">🗜️ בחר קובץ PDF או מסמך סרוק לדחיסה:</label>
+    <div class="file-dropzone" onclick="document.getElementById('pdfCompressFile').click()">
+        <div style="font-size: 36px; margin-bottom: 10px;">🗜️</div>
+        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת מסמך PDF לדחיסה</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">מתאים במיוחד למסמכים סרוקים וטפסים כבדים</div>
+        <input type="file" id="pdfCompressFile" name="file" accept=".pdf" style="display: none;" onchange="updateFileCount(this, 'fileCountCompress')">
+        <div id="fileCountCompress" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+    </div>
+
+    <label class="window-label" style="margin-top: 20px;">🎯 רמת דחיסה מבוקשת:</label>
+    <select name="level" class="input-modern" style="background-color: #1e1b4b; border-radius: var(--radius-sm); color:#fff; height: 48px;">
+        <option value="recommended" selected>⚡ דחיסה חכמה מומלצת (אידיאלי לאתרים ממשלתיים, ביטוח לאומי ומייל - ירידה של 70%-90% תוך שמירה על קריאות מלאה)</option>
+        <option value="high">🔥 דחיסה מקסימלית (נפח מינימלי למסמכים ענקיים)</option>
+        <option value="light">✨ דחיסה עדינה (שמירה על איכות מקורית מקסימלית)</option>
+    </select>
+
+    <div style="background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.25); padding: 14px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
+        💡 <strong>טיפ:</strong> הכלי מבצע דחיסה חכמה וממטב תמונות סרוקות כך שהמסמך יעבור בקלות את מגבלות הנפח (כגון 2MB / 5MB) של אתרי ביטוח לאומי ומשרדי ממשלה.
+    </div>
+
+    <button type="submit" class="submit-btn">⚡ דחוס מסמך והורד עכשיו</button>
+</form>
+{% endblock %}

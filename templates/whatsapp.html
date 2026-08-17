@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="workspace-grid">
+    <div>
+        <label class="window-label">📱 מספר טלפון (למשל 0501234567):</label>
+        <input type="text" id="waPhone" class="input-modern" placeholder="הכנס מספר טלפון..." oninput="processWhatsapp()">
+        <label class="window-label">💬 הודעה מוכנה מראש (אופציונלי):</label>
+        <textarea id="waMsg" style="height: 120px;" placeholder="הקלד את ההודעה שתפתח אוטומטית בשיחה..." oninput="processWhatsapp()"></textarea>
+    </div>
+    <div>
+        <div class="window-header">
+            <span class="window-label">🔗 הקישור המוכן שלך:</span>
+            <button id="waCopyBtn" class="mini-copy-btn" onclick="copyResult('waDst', 'waCopyBtn')">📋 העתק קישור</button>
+        </div>
+        <textarea id="waDst" class="output-area" style="height: 110px; font-family: monospace; font-size: 14px; color: var(--accent);" placeholder="הקישור הגולמי ייווצר כאן..." readonly></textarea>
+        
+        <div style="margin-top: 15px;">
+            <span class="window-label" style="display: block; margin-bottom: 6px;">🚀 קישור ישיר לפתיחה מיידית:</span>
+            <a id="waDirectLink" href="#" target="_blank" class="wa-link-anchor" style="display: none;">לחץ כאן כדי לפתוח את הווטסאפ</a>
+            <div id="waPlaceholder" style="text-align: center; padding: 20px; color: rgba(255,255,255,0.25); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-md); font-size: 14px;">הזן מספר טלפון כדי להפעיל את הקישור המהיר...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/whatsapp.js"></script>
+{% endblock %}

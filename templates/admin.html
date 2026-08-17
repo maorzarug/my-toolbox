@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not authenticated %}
+<div style="max-width: 400px; margin: 0 auto; text-align: right;">
+    <div class="admin-card">
+        <h3 style="justify-content: center;">🔒 כניסה למערכת ניהול</h3>
+        {% if error %}
+            <div style="background: rgba(248, 113, 113, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 10px; border-radius: var(--radius-sm); margin-bottom: 15px; text-align: center; font-size: 14px;">
+                {{ error }}
+            </div>
+        {% endif %}
+        <form method="POST" action="/admin/login">
+            <label class="window-label">סיסמת מנהל:</label>
+            <input type="password" name="password" class="input-modern" placeholder="הכנס סיסמה..." required>
+            <button type="submit" class="submit-btn" style="margin-top: 10px;">כניסה למערכת</button>
+        </form>
+    </div>
+</div>
+{% else %}
+<form method="POST" action="/admin/save" style="text-align: right;">
+    {% if message %}
+        <div style="background: rgba(52, 211, 153, 0.15); border: 1px solid var(--success); color: var(--success); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px; text-align: center; font-weight: 600;">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <!-- חלון פרסומת 1 (עליון) -->
+    <div class="admin-card">
+        <h3>📢 חלון פרסומת 1 (עליון - ראש הדף)</h3>
+        <label class="toggle-switch" style="margin-bottom: 16px;">
+            <input type="checkbox" name="top_enabled" value="1" {% if config.top_ad.enabled %}checked{% endif %}>
+            <span>הפעל פרסומת עליונה</span>
+        </label>
+
+        <div style="margin-bottom: 16px;">
+            <label class="window-label">סוג הפרסומת:</label>
+            <div style="display: flex; gap: 20px;">
+                <label style="cursor: pointer;"><input type="radio" name="top_type" value="custom" {% if config.top_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('top')"> באנר מותאם אישית (תמונה + קישור)</label>
+                <label style="cursor: pointer;"><input type="radio" name="top_type" value="html" {% if config.top_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('top')"> קוד Google AdSense / HTML</label>
+            </div>
+        </div>
+
+        <div id="top_custom_fields" style="display: {% if config.top_ad.type == 'custom' %}block{% else %}none{% endif %};">
+            <label class="window-label">🔗 קישור ישיר לתמונת הבאנר (Image URL):</label>
+            <input type="text" name="top_image_url" value="{{ config.top_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner.jpg">
+
+            <label class="window-label">🌐 קישור לאתר היעד (כשלוחצים על התמונה):</label>
+            <input type="text" name="top_link_url" value="{{ config.top_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il">
+
+            <label class="window-label">טקסט תיאור (Alt Text):</label>
+            <input type="text" name="top_alt_text" value="{{ config.top_ad.alt_text }}" class="input-modern" placeholder="מבצע מיוחד">
+        </div>
+
+        <div id="top_html_fields" style="display: {% if config.top_ad.type == 'html' %}block{% else %}none{% endif %};">
+            <label class="window-label">📜 קוד HTML / סקריפט מ-AdSense:</label>
+            <textarea name="top_html_code" style="height: 120px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.top_ad.html_code }}</textarea>
+        </div>
+    </div>
+
+    <!-- חלון פרסומת 2 (תחתון) -->
+    <div class="admin-card">
+        <h3>📢 חלון פרסומת 2 (תחתון - מתחת לכלים)</h3>
+        <label class="toggle-switch" style="margin-bottom: 16px;">
+            <input type="checkbox" name="bottom_enabled" value="1" {% if config.bottom_ad.enabled %}checked{% endif %}>
+            <span>הפעל פרסומת תחתונה</span>
+        </label>
+
+        <div style="margin-bottom: 16px;">
+            <label class="window-label">סוג הפרסומת:</label>
+            <div style="display: flex; gap: 20px;">
+                <label style="cursor: pointer;"><input type="radio" name="bottom_type" value="custom" {% if config.bottom_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('bottom')"> באנר מותאם אישית (תמונה + קישור)</label>
+                <label style="cursor: pointer;"><input type="radio" name="bottom_type" value="html" {% if config.bottom_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('bottom')"> קוד Google AdSense / HTML</label>
+            </div>
+        </div>
+
+        <div id="bottom_custom_fields" style="display: {% if config.bottom_ad.type == 'custom' %}block{% else %}none{% endif %};">
+            <label class="window-label">🔗 קישור ישיר לתמונת הבאנר (Image URL):</label>
+            <input type="text" name="bottom_image_url" value="{{ config.bottom_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner2.jpg">
+
+            <label class="window-label">🌐 קישור לאתר היעד (כשלוחצים על התמונה):</label>
+            <input type="text" name="bottom_link_url" value="{{ config.bottom_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il">
+
+            <label class="window-label">טקסט תיאור (Alt Text):</label>
+            <input type="text" name="bottom_alt_text" value="{{ config.bottom_ad.alt_text }}" class="input-modern" placeholder="פרסומת">
+        </div>
+
+        <div id="bottom_html_fields" style="display: {% if config.bottom_ad.type == 'html' %}block{% else %}none{% endif %};">
+            <label class="window-label">📜 קוד HTML / סקריפט מ-AdSense:</label>
+            <textarea name="bottom_html_code" style="height: 120px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.bottom_ad.html_code }}</textarea>
+        </div>
+    </div>
+
+    <!-- שינוי סיסמה -->
+    <div class="admin-card">
+        <h3>🔑 שינוי סיסמת מנהל</h3>
+        <label class="window-label">סיסמה חדשה (השאר ריק כדי לשמור על הסיסמה הנוכחית):</label>
+        <input type="password" name="new_password" class="input-modern" placeholder="הכנס סיסמה חדשה...">
+    </div>
+
+    <button type="submit" class="submit-btn" style="font-size: 18px; padding: 18px;">💾 שמור את כל הגדרות הפרסומות</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleAdType(prefix) {
+    const isCustom = document.querySelector(`input[name="${prefix}_type"]:checked`).value === 'custom';
+    document.getElementById(`${prefix}_custom_fields`).style.display = isCustom ? 'block' : 'none';
+    document.getElementById(`${prefix}_html_fields`).style.display = isCustom ? 'none' : 'block';
+}
+</script>
+{% endblock %}

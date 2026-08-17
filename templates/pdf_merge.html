@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/action/pdf-merge" method="POST" enctype="multipart/form-data" style="text-align: right;">
+    <div class="file-dropzone" onclick="document.getElementById('pdfMergeFiles').click()">
+        <div style="font-size: 36px; margin-bottom: 10px;">📄</div>
+        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת קובצי PDF למיזוג</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">ניתן לבחור מספר קבצים בו-זמנית</div>
+        <input type="file" id="pdfMergeFiles" name="files" accept=".pdf" multiple style="display: none;" onchange="updateFileCount(this, 'fileCountMerge')">
+        <div id="fileCountMerge" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+    </div>
+    <button type="submit" class="submit-btn">📑 מזג את כל הקבצים למסמך אחד</button>
+</form>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/action/img-resize" method="POST" enctype="multipart/form-data" style="text-align: right;">
+    <div class="file-dropzone" onclick="document.getElementById('imgResizeFile').click()">
+        <div style="font-size: 36px; margin-bottom: 10px;">📐</div>
+        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת תמונה לשינוי גודל</div>
+        <input type="file" id="imgResizeFile" name="file" accept="image/*" style="display: none;" onchange="updateFileCount(this, 'fileCountResize')">
+        <div id="fileCountResize" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+    </div>
+
+    <div class="workspace-grid" style="margin-top: 15px;">
+        <div>
+            <label class="window-label">↔️ רוחב מבוקש (בפיקסלים):</label>
+            <input type="number" name="width" value="800" min="10" max="10000" class="input-modern">
+        </div>
+        <div>
+            <label class="window-label">↕️ גובה מבוקש (בפיקסלים):</label>
+            <input type="number" name="height" value="600" min="10" max="10000" class="input-modern">
+        </div>
+    </div>
+
+    <button type="submit" class="submit-btn">📐 שנה גודל והורד תמונה</button>
+</form>
+{% endblock %}

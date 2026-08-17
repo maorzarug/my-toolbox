@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form action="/action/pdf-to-img" method="POST" enctype="multipart/form-data" style="text-align: right;">
+    <div class="file-dropzone" onclick="document.getElementById('pdfToImgFile').click()">
+        <div style="font-size: 36px; margin-bottom: 10px;">🖼️</div>
+        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת קובץ PDF לפירוק</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">כל דפי המסמך יחולצו כתמונות JPEG בתוך קובץ ZIP</div>
+        <input type="file" id="pdfToImgFile" name="file" accept=".pdf" style="display: none;" onchange="updateFileCount(this, 'fileCountPdfImg')">
+        <div id="fileCountPdfImg" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+    </div>
+    <button type="submit" class="submit-btn">📦 חלץ דפים לתמונות (ZIP)</button>
+</form>
+{% endblock %}
