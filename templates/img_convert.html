@@ -1,23 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="/action/img-convert" method="POST" enctype="multipart/form-data" style="text-align: right;">
+<form action="/action/img-convert" method="POST" enctype="multipart/form-data" style="text-align: right;" id="imgConvertForm">
     <div class="file-dropzone" onclick="document.getElementById('imgConvertFile').click()">
-        <div style="font-size: 36px; margin-bottom: 10px;">🔄</div>
-        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת תמונה להמרה</div>
-        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">תומך בכל סוגי התמונות הנפוצים</div>
+        <div class="dropzone-icon">🔄</div>
+        <div class="dropzone-title">לחץ או גרור לכאן תמונה להמרה</div>
+        <div class="dropzone-sub">תומך בכל סוגי התמונות: JPG, PNG, WEBP, GIF, BMP, TIFF</div>
         <input type="file" id="imgConvertFile" name="file" accept="image/*" style="display: none;" onchange="updateFileCount(this, 'fileCountConvert')">
-        <div id="fileCountConvert" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+        <div id="fileCountConvert"></div>
     </div>
 
-    <label class="window-label" style="margin-top: 15px;">🎯 בחר פורמט יעד:</label>
-    <select name="format" class="input-modern" style="background-color: #1e1b4b; border-radius: var(--radius-sm); color:#fff; height: 45px;">
-        <option value="JPEG">JPEG (.jpg) - פורמט אידיאלי ושיתופי לתמונות</option>
-        <option value="PNG">PNG (.png) - תמיכה ברקע שקוף ואיכות ללא אובדן</option>
-        <option value="WEBP">WEBP (.webp) - דחיסה מודרנית ומהירה לאתרים</option>
-        <option value="BMP">BMP (.bmp) - פורמט גרפי בסיסי</option>
-    </select>
+    <label class="window-label" style="margin-top: 24px; margin-bottom: 12px;">🎯 בחר פורמט יעד להמרה:</label>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px;">
+        <label class="btn-action active" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fmt-card-jpeg">
+            <input type="radio" name="format" value="JPEG" checked style="display: none;" onchange="updateFmtCard(this)">
+            <span style="font-size: 16px; font-weight: 800; color: #ffffff;">JPEG (.jpg)</span>
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">תמונה אוניברסלית</span>
+        </label>
 
-    <button type="submit" class="submit-btn">⚡ המר פורמט והורד</button>
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fmt-card-png">
+            <input type="radio" name="format" value="PNG" style="display: none;" onchange="updateFmtCard(this)">
+            <span style="font-size: 16px; font-weight: 800; color: #ffffff;">PNG (.png)</span>
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">ללא אובדן / שקיפות</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fmt-card-webp">
+            <input type="radio" name="format" value="WEBP" style="display: none;" onchange="updateFmtCard(this)">
+            <span style="font-size: 16px; font-weight: 800; color: #ffffff;">WEBP (.webp)</span>
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">מהיר וקל לאתרים</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fmt-card-bmp">
+            <input type="radio" name="format" value="BMP" style="display: none;" onchange="updateFmtCard(this)">
+            <span style="font-size: 16px; font-weight: 800; color: #ffffff;">BMP (.bmp)</span>
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">תמונה גולמית</span>
+        </label>
+    </div>
+
+    <button type="submit" class="submit-btn" id="convertSubmitBtn">
+        ⚡ המר פורמט והורד תמונה
+    </button>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function updateFmtCard(radio) {
+    document.querySelectorAll('[id^="fmt-card-"]').forEach(c => c.classList.remove('active'));
+    radio.closest('label').classList.add('active');
+}
+
+const form = document.getElementById('imgConvertForm');
+if (form) {
+    form.addEventListener('submit', (e) => {
+        const file = document.getElementById('imgConvertFile');
+        if (!file || file.files.length === 0) {
+            e.preventDefault();
+            showToast('אנא בחר תמונה להמרה תחילה', 'warning');
+            return;
+        }
+    });
+}
+</script>
 {% endblock %}

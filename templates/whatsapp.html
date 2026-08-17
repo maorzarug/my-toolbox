@@ -2,23 +2,35 @@
 
 {% block content %}
 <div class="workspace-grid">
-    <div>
-        <label class="window-label">📱 מספר טלפון (למשל 0501234567):</label>
-        <input type="text" id="waPhone" class="input-modern" placeholder="הכנס מספר טלפון..." oninput="processWhatsapp()">
-        <label class="window-label">💬 הודעה מוכנה מראש (אופציונלי):</label>
-        <textarea id="waMsg" style="height: 120px;" placeholder="הקלד את ההודעה שתפתח אוטומטית בשיחה..." oninput="processWhatsapp()"></textarea>
-    </div>
-    <div>
+    <div class="editor-window">
+        <label class="window-label">📱 מספר טלפון לנמען:</label>
+        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+            <input type="text" value="🇮🇱 +972" readonly style="width: 90px; text-align: center; background: rgba(255,255,255,0.05); font-weight: 700; color: var(--text-primary); cursor: default;" class="input-modern">
+            <input type="text" id="waPhone" class="input-modern" placeholder="למשל: 0501234567 או 501234567" oninput="processWhatsapp()" style="flex-grow: 1;">
+        </div>
+
         <div class="window-header">
-            <span class="window-label">🔗 הקישור המוכן שלך:</span>
+            <label class="window-label">💬 הודעה מוכנה מראש (אופציונלי):</label>
+            <span id="waMsgCounter" class="char-counter">0 תווים</span>
+        </div>
+        <textarea id="waMsg" style="height: 140px;" placeholder="הקלד כאן את ההודעה שתופיע אוטומטית כשהצד השני יפתח את הצ'אט..." oninput="processWhatsapp()"></textarea>
+    </div>
+
+    <div class="editor-window">
+        <div class="window-header">
+            <span class="window-label">🔗 הקישור הישיר שנוצר:</span>
             <button id="waCopyBtn" class="mini-copy-btn" onclick="copyResult('waDst', 'waCopyBtn')">📋 העתק קישור</button>
         </div>
-        <textarea id="waDst" class="output-area" style="height: 110px; font-family: monospace; font-size: 14px; color: var(--accent);" placeholder="הקישור הגולמי ייווצר כאן..." readonly></textarea>
+        <textarea id="waDst" class="output-area" style="height: 100px; font-family: 'JetBrains Mono', monospace; font-size: 13.5px; color: var(--accent-cyan);" placeholder="הקישור הגולמי ייווצר כאן מיידית..." readonly></textarea>
         
-        <div style="margin-top: 15px;">
-            <span class="window-label" style="display: block; margin-bottom: 6px;">🚀 קישור ישיר לפתיחה מיידית:</span>
-            <a id="waDirectLink" href="#" target="_blank" class="wa-link-anchor" style="display: none;">לחץ כאן כדי לפתוח את הווטסאפ</a>
-            <div id="waPlaceholder" style="text-align: center; padding: 20px; color: rgba(255,255,255,0.25); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-md); font-size: 14px;">הזן מספר טלפון כדי להפעיל את הקישור המהיר...</div>
+        <div style="margin-top: 18px;">
+            <span class="window-label" style="margin-bottom: 8px;">🚀 פתיחה מיידית בוואטסאפ:</span>
+            <a id="waDirectLink" href="#" target="_blank" class="submit-btn" style="background: linear-gradient(135deg, #25D366, #128C7E); display: none; text-decoration: none; font-size: 16px;">
+                🟢 פתח עכשיו שיחת וואטסאפ
+            </a>
+            <div id="waPlaceholder" style="text-align: center; padding: 24px; color: var(--text-muted); border: 1px dashed var(--border-subtle); border-radius: var(--radius-lg); font-size: 13.5px;">
+                הזן מספר טלפון כדי להפעיל את הקישור המהיר...
+            </div>
         </div>
     </div>
 </div>
@@ -26,4 +38,12 @@
 
 {% block scripts %}
 <script src="/static/js/whatsapp.js"></script>
+<script>
+const waMsgInput = document.getElementById('waMsg');
+if (waMsgInput) {
+    waMsgInput.addEventListener('input', () => {
+        document.getElementById('waMsgCounter').innerText = `${waMsgInput.value.length} תווים`;
+    });
+}
+</script>
 {% endblock %}

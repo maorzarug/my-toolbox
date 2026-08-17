@@ -2,34 +2,69 @@
 
 {% block content %}
 <form id="effectForm" style="text-align: right;">
-    <label class="window-label">🎨 בחר תמונה להחלת פילטרים מתקדמים:</label>
     <div class="file-dropzone" onclick="document.getElementById('imgEffFile').click()">
-        <div style="font-size: 36px; margin-bottom: 10px;">🎨</div>
-        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת תמונה לעיבוד</div>
+        <div class="dropzone-icon">🎨</div>
+        <div class="dropzone-title">לחץ או גרור לכאן תמונה לעיבוד פילטרים</div>
+        <div class="dropzone-sub">תמיכה בתצוגה מקדימה מיידית לפני ההורדה</div>
         <input type="file" id="imgEffFile" name="file" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
-        <div id="fileCountEff" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+        <div id="fileCountEff"></div>
     </div>
     
-    <label class="window-label">🎯 בחר אפקט או פילטר אמנותי:</label>
-    <select id="effectSelect" name="effect" class="input-modern" style="background-color: #1e1b4b; border-radius: var(--radius-sm); color:#fff; height: 45px;">
-        <option value="grayscale">📷 שחור לבן קלאסי (Grayscale)</option>
-        <option value="blur">🌫️ אפקט טשטוש עדין (Blur)</option>
-        <option value="contour">✏️ רישום קווי מתאר (Contour Sketch)</option>
-        <option value="brighten">☀️ הגברת בהירות וצבע (Brighten)</option>
-        <option value="sharpen">🔍 הגברת חדות פרטים (Sharpen)</option>
-    </select>
+    <label class="window-label" style="margin-top: 24px; margin-bottom: 12px;">🎯 בחר סגנון או פילטר אמנותי:</label>
     
-    <button type="button" id="applyEffBtn" class="submit-btn" onclick="applyEffectAndPreview()">⚡ החל אפקט והצג תצוגה מקדימה</button>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+        <label class="btn-action active" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fx-card-grayscale">
+            <input type="radio" name="effect" value="grayscale" checked style="display: none;" onchange="updateFxCard(this)">
+            <span style="font-size: 20px; margin-bottom: 4px;">📷</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #ffffff;">שחור-לבן קלאסי</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fx-card-blur">
+            <input type="radio" name="effect" value="blur" style="display: none;" onchange="updateFxCard(this)">
+            <span style="font-size: 20px; margin-bottom: 4px;">🌫️</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #ffffff;">טשטוש (Blur)</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fx-card-contour">
+            <input type="radio" name="effect" value="contour" style="display: none;" onchange="updateFxCard(this)">
+            <span style="font-size: 20px; margin-bottom: 4px;">✏️</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #ffffff;">רישום קווי מתאר</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fx-card-brighten">
+            <input type="radio" name="effect" value="brighten" style="display: none;" onchange="updateFxCard(this)">
+            <span style="font-size: 20px; margin-bottom: 4px;">☀️</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #ffffff;">הגברת בהירות</span>
+        </label>
+
+        <label class="btn-action" style="flex-direction: column; align-items: center; padding: 14px 10px; cursor: pointer; text-align: center;" id="fx-card-sharpen">
+            <input type="radio" name="effect" value="sharpen" style="display: none;" onchange="updateFxCard(this)">
+            <span style="font-size: 20px; margin-bottom: 4px;">🔍</span>
+            <span style="font-size: 13.5px; font-weight: 700; color: #ffffff;">חידוד פרטים</span>
+        </label>
+    </div>
+    
+    <button type="button" id="applyEffBtn" class="submit-btn" onclick="applyEffectAndPreview()">
+        ⚡ החל אפקט והצג תצוגה מקדימה
+    </button>
     
     <div id="previewContainer">
-        <label class="window-label" style="display: block; margin-top: 10px;">👀 תצוגה מקדימה (JPEG):</label>
+        <label class="window-label" style="display: block; margin-bottom: 12px;">👀 תצוגה מקדימה של התוצאה:</label>
         <img id="imagePreview" src="" alt="תצוגה מקדימה של האפקט">
         <br>
-        <button type="button" class="btn-action" style="background: var(--success); margin-top: 15px; width: auto;" onclick="downloadProcessedImage()">💾 הורד תמונה סופית (JPEG)</button>
+        <button type="button" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669); max-width: 320px; margin: 18px auto 0 auto;" onclick="downloadProcessedImage()">
+            💾 הורד תמונה מעובדת (JPEG)
+        </button>
     </div>
 </form>
 {% endblock %}
 
 {% block scripts %}
 <script src="/static/js/img-effects.js"></script>
+<script>
+function updateFxCard(radio) {
+    document.querySelectorAll('[id^="fx-card-"]').forEach(c => c.classList.remove('active'));
+    radio.closest('label').classList.add('active');
+}
+</script>
 {% endblock %}

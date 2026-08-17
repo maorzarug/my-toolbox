@@ -1,13 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div style="line-height: 1.8; color: var(--text-muted); font-size: 15px; text-align: right;">
-    <p>ברוכים הבאים ל-<strong>ToolHub</strong> – ארגז הכלים הדיגיטלי המוביל ברשת לעבודה יעילה, נוחה ומהירה.</p>
-    <p>האתר נבנה מתוך מטרה לספק פתרונות חינמיים, איכותיים ונגישים לצרכים יומיומיים: ניקוד עברית, היפוך טקסטים, דחיסת מסמכי PDF לאתרים ממשלתיים, המרת תמונות ועוד – והכל במקום אחד, במהירות שיא וללא צורך בהתקנת תוכנות.</p>
-    <div style="margin-top: 30px; padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: var(--radius-md); text-align: center;">
-        <h3 style="margin-top: 0; color: #fff;">☕ אהבתם את האתר? רוצים לתמוך בהמשך הפיתוח?</h3>
-        <p style="font-size: 14px; margin-bottom: 20px;">התרומה שלכם עוזרת לנו לשמור על השרתים פעילים ולפתח כלים חינמיים חדשים עבור כולם.</p>
-        <a href="{{ PAYPAL_LINK }}" target="_blank" class="btn-action" style="background: linear-gradient(135deg, #0070ba, #003087); color: white; border: none; padding: 12px 24px; display: inline-block; font-size: 15px; font-weight: 700; text-decoration: none;">
+<div style="text-align: right; line-height: 1.8; color: var(--text-secondary); font-size: 15px;">
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-subtle);">
+        <img src="/icon.png" alt="ToolHub" style="width: 64px; height: 64px; border-radius: var(--radius-lg); box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);">
+        <div>
+            <h3 style="font-size: 22px; font-weight: 800; color: #ffffff; margin-bottom: 2px;">ToolHub Digital Toolkit</h3>
+            <div style="font-size: 13px; color: var(--accent-cyan); font-weight: 600;">כלים דיגיטליים מתקדמים וחינמיים ברמת פרימיום</div>
+        </div>
+    </div>
+
+    <p style="margin-bottom: 16px;">
+        <strong>ToolHub</strong> נולד במטרה לספק פתרונות מהירים, נקיים ומאובטחים לצרכים הדיגיטליים היומיומיים ביותר: ניקוד עברית, היפוך טקסטים, דחיסת מסמכים לאתרים ממשלתיים, המרת תמונות ועוד – והכל במקום אחד, במהירות שיא וללא צורך בהתקנת תוכנות או תשלום.
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 28px 0;">
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 18px; border-radius: var(--radius-lg);">
+            <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+            <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">פרטיות מלאה</div>
+            <div style="font-size: 13px; color: var(--text-muted);">הקבצים והטקסטים שלך מעובדים באופן מאובטח ואינם נשמרים בשרת.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 18px; border-radius: var(--radius-lg);">
+            <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
+            <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">מהירות ללא פשרות</div>
+            <div style="font-size: 13px; color: var(--text-muted);">עיבוד מיידי תוך שניות בודדות ללא המתנה או תורים.</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); padding: 18px; border-radius: var(--radius-lg);">
+            <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
+            <div style="font-weight: 700; color: #ffffff; margin-bottom: 4px;">רספונסיביות מושלמת</div>
+            <div style="font-size: 13px; color: var(--text-muted);">חוויית משתמש חלקה ומותאמת למחשב, טאבלט ולסמארטפון.</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 35px; padding: 28px; background: rgba(56, 189, 248, 0.03); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-xl); text-align: center;">
+        <h3 style="margin-top: 0; color: #ffffff; font-size: 20px; font-weight: 800;">☕ אהבתם את ToolHub?</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin: 8px auto 20px auto; max-width: 500px;">
+            התמיכה שלכם עוזרת לנו לשמור על השרתים מהירים, ללא הגבלות, ולהמשיך לפתח כלים דיגיטליים חדשים לכולם.
+        </p>
+        <a href="{{ PAYPAL_LINK }}" target="_blank" class="submit-btn" style="background: linear-gradient(135deg, #0070ba, #003087); color: white; display: inline-flex; width: auto; padding: 12px 30px; font-size: 15px; text-decoration: none;">
             💙 תמיכה בפרויקט באמצעות PayPal
         </a>
     </div>

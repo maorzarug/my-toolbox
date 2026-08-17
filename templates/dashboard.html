@@ -1,56 +1,126 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="tools-dashboard">
-    <a href="/inverter" class="tool-card">
-        <div class="tool-icon">🔄</div>
-        <div class="tool-title">היפוך טקסט ומקלדת</div>
-        <div class="tool-desc">היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב ללא טעינת עמוד.</div>
+<!-- Hero Live Search Box -->
+<div class="hero-search-box">
+    <input type="text" id="toolSearchInput" class="hero-search-input" placeholder="🔍 חפש כלי עבודה מהיר... (הקלד 'PDF', 'דחיסה', 'ניקוד', 'וואטסאפ'...)" oninput="filterTools()">
+    <span class="search-icon" style="font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">Ctrl + K</span>
+</div>
+
+<!-- Category Filter Pills -->
+<div class="category-pills">
+    <button class="pill-btn active" onclick="setCategoryFilter('all', this)">⚡ כל הכלים (10)</button>
+    <button class="pill-btn" onclick="setCategoryFilter('pdf', this)">📄 מסמכי PDF (3)</button>
+    <button class="pill-btn" onclick="setCategoryFilter('img', this)">🖼️ תמונות (3)</button>
+    <button class="pill-btn" onclick="setCategoryFilter('text', this)">✍️ טקסט ועברית (2)</button>
+    <button class="pill-btn" onclick="setCategoryFilter('links', this)">🟢 שיתוף וקישורים (1)</button>
+</div>
+
+<!-- Tools Grid -->
+<div class="tools-grid" id="toolsGrid">
+    <!-- Inverter -->
+    <a href="/inverter" class="tool-card" data-category="text" data-title="היפוך טקסט ומקלדת עברית אנגלית ג'יבריש" data-desc="היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב ללא טעינת עמוד">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">🔄</div>
+            <span class="tool-tag">טקסט</span>
+        </div>
+        <div class="tool-card-title">היפוך טקסט ומקלדת</div>
+        <div class="tool-card-desc">היפוך אותיות, שורות ותיקון ג'יבריש מקלדת בלייב ללא טעינת עמוד.</div>
     </a>
-    <a href="/whatsapp" class="tool-card">
-        <div class="tool-icon">🟢</div>
-        <div class="tool-title">מחולל קישורי וואטסאפ</div>
-        <div class="tool-desc">יצירת קישור ישיר לשיחה מהירה כולל טקסט מוכן מראש לשיתוף נוח.</div>
+
+    <!-- WhatsApp -->
+    <a href="/whatsapp" class="tool-card" data-category="links" data-title="מחולל קישורי וואטסאפ מהיר הודעה מוכנה" data-desc="יצירת קישור ישיר לשיחה מהירה כולל טקסט מוכן מראש לשיתוף נוח">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">🟢</div>
+            <span class="tool-tag">קישורים</span>
+        </div>
+        <div class="tool-card-title">מחולל קישורי וואטסאפ</div>
+        <div class="tool-card-desc">יצירת קישור ישיר לשיחה מהירה כולל טקסט מוכן מראש לשיתוף נוח.</div>
     </a>
-    <a href="/nikud" class="tool-card">
-        <div class="tool-icon">✍️</div>
-        <div class="tool-title">ניקוד אוטומטי לעברית</div>
-        <div class="tool-desc">הזנת משפט חופשי וקבלת ניקוד מיידי עם אפשרות תיקון ועריכה ידנית.</div>
+
+    <!-- Nikud -->
+    <a href="/nikud" class="tool-card" data-category="text" data-title="ניקוד אוטומטי לעברית עורך אינטראקטיבי" data-desc="הזנת משפט חופשי וקבלת ניקוד מיידי עם אפשרות תיקון ועריכה ידנית בתפריט צף">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">✍️</div>
+            <span class="tool-tag">טקסט</span>
+        </div>
+        <div class="tool-card-title">ניקוד אוטומטי לעברית</div>
+        <div class="tool-card-desc">הזנת משפט חופשי וקבלת ניקוד מיידי עם אפשרות תיקון ועריכה ידנית.</div>
     </a>
-    <a href="/pdf-merge" class="tool-card">
-        <div class="tool-icon">📄</div>
-        <div class="tool-title">מיזוג קבצי PDF</div>
-        <div class="tool-desc">איחוד מספר מסמכי PDF נפרדים לקובץ מסמך אחד מסודר ורציף.</div>
+
+    <!-- PDF Compress (Highlighted) -->
+    <a href="/pdf-compress" class="tool-card" data-category="pdf" data-title="דחיסת קבצי PDF ממשלתי ביטוח לאומי הקטנת נפח סריקות" data-desc="הקטנה ודחיסה חכמה של סריקות ומסמכים ב-70%-90% עבור אתרים ממשלתיים ומייל">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper" style="border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.08);">🗜️</div>
+            <span class="tool-tag" style="color: var(--accent-cyan); background: rgba(56, 189, 248, 0.1);">מומלץ לממשל</span>
+        </div>
+        <div class="tool-card-title">דחיסת PDF ממשלתית</div>
+        <div class="tool-card-desc">צמצום של 70%-90% בנפח מסמכים וסריקות לשליחה קלה בביטוח לאומי ומייל.</div>
     </a>
-    <a href="/pdf-to-img" class="tool-card">
-        <div class="tool-icon">🖼️</div>
-        <div class="tool-title">PDF לתמונות</div>
-        <div class="tool-desc">חילוץ והמרת כל דפי מסמך ה-PDF לתמונות JPEG באיכות גבוהה ב-ZIP.</div>
+
+    <!-- PDF Merge -->
+    <a href="/pdf-merge" class="tool-card" data-category="pdf" data-title="מיזוג קבצי PDF איחוד מסמכים" data-desc="איחוד מספר מסמכי PDF נפרדים לקובץ מסמך אחד מסודר ורציף">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">📄</div>
+            <span class="tool-tag">PDF</span>
+        </div>
+        <div class="tool-card-title">מיזוג קובצי PDF</div>
+        <div class="tool-card-desc">איחוד מספר מסמכי PDF נפרדים לקובץ מסמך אחד מסודר ורציף.</div>
     </a>
-    <a href="/pdf-compress" class="tool-card">
-        <div class="tool-icon">🗜️</div>
-        <div class="tool-title">דחיסת קבצי PDF</div>
-        <div class="tool-desc">הקטנה ודחיסה של מסמכים וסריקות לשליחה קלה במייל ובאתרים ממשלתיים.</div>
+
+    <!-- PDF to Image -->
+    <a href="/pdf-to-img" class="tool-card" data-category="pdf" data-title="PDF לתמונות המרת דפים לתמונות ZIP" data-desc="חילוץ והמרת כל דפי מסמך ה-PDF לתמונות JPEG באיכות גבוהה ב-ZIP">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">🖼️</div>
+            <span class="tool-tag">PDF</span>
+        </div>
+        <div class="tool-card-title">PDF לתמונות (ZIP)</div>
+        <div class="tool-card-desc">חילוץ והמרת כל דפי מסמך ה-PDF לתמונות JPEG באיכות גבוהה.</div>
     </a>
-    <a href="/img-convert" class="tool-card">
-        <div class="tool-icon">🔄</div>
-        <div class="tool-title">המרת פורמט תמונה</div>
-        <div class="tool-desc">המרה מהירה בין פורמטים נפוצים: JPG, PNG, WEBP ו-BMP.</div>
+
+    <!-- Image Convert -->
+    <a href="/img-convert" class="tool-card" data-category="img" data-title="המרת פורמט תמונה JPG PNG WEBP BMP" data-desc="המרה מהירה ואיכותית בין פורמטים נפוצים: JPG, PNG, WEBP ו-BMP">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">🔄</div>
+            <span class="tool-tag">תמונות</span>
+        </div>
+        <div class="tool-card-title">המרת פורמט תמונה</div>
+        <div class="tool-card-desc">המרה מהירה ואיכותית בין פורמטים נפוצים: JPG, PNG, WEBP ו-BMP.</div>
     </a>
-    <a href="/img-resize" class="tool-card">
-        <div class="tool-icon">📐</div>
-        <div class="tool-title">שינוי גודל תמונה</div>
-        <div class="tool-desc">התאמת ממדי אורך ורוחב של תמונות לפיקסלים מוגדרים מראש.</div>
+
+    <!-- Image Resize -->
+    <a href="/img-resize" class="tool-card" data-category="img" data-title="שינוי גודל תמונה פיקסלים רזולוציה" data-desc="התאמת ממדי אורך ורוחב של תמונות לפיקסלים מוגדרים מראש">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">📐</div>
+            <span class="tool-tag">תמונות</span>
+        </div>
+        <div class="tool-card-title">שינוי גודל תמונה</div>
+        <div class="tool-card-desc">התאמת ממדי אורך ורוחב של תמונות לפיקסלים מוגדרים מראש.</div>
     </a>
-    <a href="/img-effects" class="tool-card">
-        <div class="tool-icon">🎨</div>
-        <div class="tool-title">פילטרים ואפקטים</div>
-        <div class="tool-desc">החלת פילטרים: שחור-לבן, טשטוש, חידוד ושרטוט עם תצוגה מקדימה.</div>
+
+    <!-- Image Effects -->
+    <a href="/img-effects" class="tool-card" data-category="img" data-title="פילטרים ואפקטים לתמונות שחור לבן טשטוש חידוד" data-desc="החלת פילטרים: שחור-לבן, טשטוש, חידוד ושרטוט עם תצוגה מקדימה והורדה">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">🎨</div>
+            <span class="tool-tag">תמונות</span>
+        </div>
+        <div class="tool-card-title">פילטרים ואפקטים</div>
+        <div class="tool-card-desc">החלת פילטרים: שחור-לבן, טשטוש, חידוד ושרטוט עם תצוגה מקדימה.</div>
     </a>
-    <a href="/about" class="tool-card">
-        <div class="tool-icon">ℹ️</div>
-        <div class="tool-title">אודות הפרויקט</div>
-        <div class="tool-desc">הכירו את סיפור הפיתוח של ToolHub ואפשרויות התמיכה במיזם.</div>
+
+    <!-- About -->
+    <a href="/about" class="tool-card" data-category="all" data-title="אודות הפרויקט תמיכה פייפאל" data-desc="הכירו את סיפור הפיתוח של ToolHub ואפשרויות התמיכה במיזם">
+        <div class="tool-card-top">
+            <div class="tool-icon-wrapper">ℹ️</div>
+            <span class="tool-tag">מידע</span>
+        </div>
+        <div class="tool-card-title">אודות הפרויקט</div>
+        <div class="tool-card-desc">הכירו את סיפור הפיתוח של ToolHub ואפשרויות התמיכה במיזם.</div>
     </a>
+</div>
+
+<div id="noResultsMsg" style="display: none; text-align: center; padding: 40px; color: var(--text-muted);">
+    <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+    <div>לא נמצאו כלים התואמים לחיפוש שלך</div>
 </div>
 {% endblock %}

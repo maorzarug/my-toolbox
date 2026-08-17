@@ -1,25 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form action="/action/img-resize" method="POST" enctype="multipart/form-data" style="text-align: right;">
+<form action="/action/img-resize" method="POST" enctype="multipart/form-data" style="text-align: right;" id="imgResizeForm">
     <div class="file-dropzone" onclick="document.getElementById('imgResizeFile').click()">
-        <div style="font-size: 36px; margin-bottom: 10px;">📐</div>
-        <div style="font-weight: 700; font-size: 16px;">לחץ לבחירת תמונה לשינוי גודל</div>
-        <input type="file" id="imgResizeFile" name="file" accept="image/*" style="display: none;" onchange="updateFileCount(this, 'fileCountResize')">
-        <div id="fileCountResize" style="margin-top: 12px; font-weight: 700; color: var(--accent);"></div>
+        <div class="dropzone-icon">📐</div>
+        <div class="dropzone-title">לחץ או גרור לכאן תמונה לשינוי גודל</div>
+        <div class="dropzone-sub">הזן מידות מותאמות אישית או בחר מההגדרות המהירות</div>
+        <input type="file" id="imgResizeFile" name="file" accept="image/*" style="display: none;" onchange="handleResizeFileSelect(this)">
+        <div id="fileCountResize"></div>
     </div>
 
-    <div class="workspace-grid" style="margin-top: 15px;">
-        <div>
+    <div class="workspace-grid" style="margin-top: 20px;">
+        <div class="editor-window">
             <label class="window-label">↔️ רוחב מבוקש (בפיקסלים):</label>
-            <input type="number" name="width" value="800" min="10" max="10000" class="input-modern">
+            <input type="number" id="resizeWidth" name="width" value="1200" min="10" max="10000" class="input-modern" style="font-family: 'JetBrains Mono', monospace; font-size: 16px;">
         </div>
-        <div>
+        <div class="editor-window">
             <label class="window-label">↕️ גובה מבוקש (בפיקסלים):</label>
-            <input type="number" name="height" value="600" min="10" max="10000" class="input-modern">
+            <input type="number" id="resizeHeight" name="height" value="800" min="10" max="10000" class="input-modern" style="font-family: 'JetBrains Mono', monospace; font-size: 16px;">
         </div>
     </div>
 
-    <button type="submit" class="submit-btn">📐 שנה גודל והורד תמונה</button>
+    <div style="margin-top: 12px; margin-bottom: 20px;">
+        <span class="window-label" style="margin-bottom: 8px;">⚡ גדלים פופולריים מהירים:</span>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn-action" onclick="setPreset(1920, 1080)">Full HD (1920x1080)</button>
+            <button type="button" class="btn-action" onclick="setPreset(1200, 630)">רשתות חברתיות (1200x630)</button>
+            <button type="button" class="btn-action" onclick="setPreset(1080, 1080)">אינסטגרם מרובע (1080x1080)</button>
+            <button type="button" class="btn-action" onclick="setPreset(800, 600)">סטנדרטי (800x600)</button>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="resizeSubmitBtn">
+        📐 שנה גודל והורד תמונה מעובדת
+    </button>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setPreset(w, h) {
+    document.getElementById('resizeWidth').value = w;
+    document.getElementById('resizeHeight').value = h;
+    showToast(`הוגדר גודל: ${w}x${h}px`);
+}
+
+function handleResizeFileSelect(input) {
+    updateFileCount(input, 'fileCountResize');
+    if (input.files && input.files[0]) {
+        const img = new Image();
+        img.onload = function() {
+            document.getElementById('resizeWidth').value = this.width;
+            document.getElementById('resizeHeight').value = this.height;
+            showToast(`זוהו מידות מקוריות: ${this.width}x${this.height}px`);
+        };
+        img.src = URL.createObjectURL(input.files[0]);
+    }
+}
+</script>
 {% endblock %}

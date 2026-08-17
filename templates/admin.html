@@ -2,51 +2,59 @@
 
 {% block content %}
 {% if not authenticated %}
-<div style="max-width: 400px; margin: 0 auto; text-align: right;">
-    <div class="admin-card">
-        <h3 style="justify-content: center;">🔒 כניסה למערכת ניהול</h3>
+<div style="max-width: 440px; margin: 20px auto; text-align: right;">
+    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); padding: 32px; border-radius: var(--radius-xl); box-shadow: var(--shadow-elevated);">
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔒</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #ffffff;">כניסה למערכת ניהול פרסומות</h3>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">הזן סיסמת מנהל כדי לעדכן את הבאנרים וההגדרות</div>
+        </div>
+
         {% if error %}
-            <div style="background: rgba(248, 113, 113, 0.15); border: 1px solid var(--danger); color: var(--danger); padding: 10px; border-radius: var(--radius-sm); margin-bottom: 15px; text-align: center; font-size: 14px;">
-                {{ error }}
+            <div style="background: var(--danger-bg); border: 1px solid var(--danger); color: var(--danger); padding: 12px; border-radius: var(--radius-md); margin-bottom: 18px; text-align: center; font-size: 13.5px; font-weight: 600;">
+                ⚠️ {{ error }}
             </div>
         {% endif %}
+
         <form method="POST" action="/admin/login">
             <label class="window-label">סיסמת מנהל:</label>
-            <input type="password" name="password" class="input-modern" placeholder="הכנס סיסמה..." required>
-            <button type="submit" class="submit-btn" style="margin-top: 10px;">כניסה למערכת</button>
+            <input type="password" name="password" class="input-modern" placeholder="הכנס סיסמה..." required style="margin-bottom: 16px;">
+            <button type="submit" class="submit-btn">🔐 כניסה למערכת</button>
         </form>
     </div>
 </div>
 {% else %}
 <form method="POST" action="/admin/save" style="text-align: right;">
     {% if message %}
-        <div style="background: rgba(52, 211, 153, 0.15); border: 1px solid var(--success); color: var(--success); padding: 12px; border-radius: var(--radius-sm); margin-bottom: 20px; text-align: center; font-weight: 600;">
+        <div style="background: var(--success-bg); border: 1px solid var(--success); color: var(--success); padding: 14px; border-radius: var(--radius-md); margin-bottom: 24px; text-align: center; font-weight: 700;">
             {{ message }}
         </div>
     {% endif %}
 
     <!-- חלון פרסומת 1 (עליון) -->
-    <div class="admin-card">
-        <h3>📢 חלון פרסומת 1 (עליון - ראש הדף)</h3>
-        <label class="toggle-switch" style="margin-bottom: 16px;">
-            <input type="checkbox" name="top_enabled" value="1" {% if config.top_ad.enabled %}checked{% endif %}>
-            <span>הפעל פרסומת עליונה</span>
-        </label>
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">📢 חלון פרסומת 1 (עליון - ראש הדף)</h3>
+            <label class="btn-action" style="cursor: pointer; gap: 8px;">
+                <input type="checkbox" name="top_enabled" value="1" {% if config.top_ad.enabled %}checked{% endif %} style="accent-color: var(--accent-cyan); width: 16px; height: 16px;">
+                <span>פרסומת פעילה</span>
+            </label>
+        </div>
 
         <div style="margin-bottom: 16px;">
             <label class="window-label">סוג הפרסומת:</label>
-            <div style="display: flex; gap: 20px;">
-                <label style="cursor: pointer;"><input type="radio" name="top_type" value="custom" {% if config.top_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('top')"> באנר מותאם אישית (תמונה + קישור)</label>
-                <label style="cursor: pointer;"><input type="radio" name="top_type" value="html" {% if config.top_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('top')"> קוד Google AdSense / HTML</label>
+            <div style="display: flex; gap: 18px;">
+                <label style="cursor: pointer; font-size: 13.5px;"><input type="radio" name="top_type" value="custom" {% if config.top_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('top')"> באנר מותאם אישית (תמונה + קישור)</label>
+                <label style="cursor: pointer; font-size: 13.5px;"><input type="radio" name="top_type" value="html" {% if config.top_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('top')"> קוד Google AdSense / HTML</label>
             </div>
         </div>
 
         <div id="top_custom_fields" style="display: {% if config.top_ad.type == 'custom' %}block{% else %}none{% endif %};">
             <label class="window-label">🔗 קישור ישיר לתמונת הבאנר (Image URL):</label>
-            <input type="text" name="top_image_url" value="{{ config.top_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner.jpg">
+            <input type="text" name="top_image_url" value="{{ config.top_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner.jpg" style="margin-bottom: 12px;">
 
-            <label class="window-label">🌐 קישור לאתר היעד (כשלוחצים על התמונה):</label>
-            <input type="text" name="top_link_url" value="{{ config.top_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il">
+            <label class="window-label">🌐 קישור יעד (כשלוחצים על הבאנר):</label>
+            <input type="text" name="top_link_url" value="{{ config.top_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il" style="margin-bottom: 12px;">
 
             <label class="window-label">טקסט תיאור (Alt Text):</label>
             <input type="text" name="top_alt_text" value="{{ config.top_ad.alt_text }}" class="input-modern" placeholder="מבצע מיוחד">
@@ -54,32 +62,34 @@
 
         <div id="top_html_fields" style="display: {% if config.top_ad.type == 'html' %}block{% else %}none{% endif %};">
             <label class="window-label">📜 קוד HTML / סקריפט מ-AdSense:</label>
-            <textarea name="top_html_code" style="height: 120px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.top_ad.html_code }}</textarea>
+            <textarea name="top_html_code" style="height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 13px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.top_ad.html_code }}</textarea>
         </div>
     </div>
 
     <!-- חלון פרסומת 2 (תחתון) -->
-    <div class="admin-card">
-        <h3>📢 חלון פרסומת 2 (תחתון - מתחת לכלים)</h3>
-        <label class="toggle-switch" style="margin-bottom: 16px;">
-            <input type="checkbox" name="bottom_enabled" value="1" {% if config.bottom_ad.enabled %}checked{% endif %}>
-            <span>הפעל פרסומת תחתונה</span>
-        </label>
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin: 0;">📢 חלון פרסומת 2 (תחתון - מתחת לכלים)</h3>
+            <label class="btn-action" style="cursor: pointer; gap: 8px;">
+                <input type="checkbox" name="bottom_enabled" value="1" {% if config.bottom_ad.enabled %}checked{% endif %} style="accent-color: var(--accent-cyan); width: 16px; height: 16px;">
+                <span>פרסומת פעילה</span>
+            </label>
+        </div>
 
         <div style="margin-bottom: 16px;">
             <label class="window-label">סוג הפרסומת:</label>
-            <div style="display: flex; gap: 20px;">
-                <label style="cursor: pointer;"><input type="radio" name="bottom_type" value="custom" {% if config.bottom_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('bottom')"> באנר מותאם אישית (תמונה + קישור)</label>
-                <label style="cursor: pointer;"><input type="radio" name="bottom_type" value="html" {% if config.bottom_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('bottom')"> קוד Google AdSense / HTML</label>
+            <div style="display: flex; gap: 18px;">
+                <label style="cursor: pointer; font-size: 13.5px;"><input type="radio" name="bottom_type" value="custom" {% if config.bottom_ad.type == 'custom' %}checked{% endif %} onchange="toggleAdType('bottom')"> באנר מותאם אישית (תמונה + קישור)</label>
+                <label style="cursor: pointer; font-size: 13.5px;"><input type="radio" name="bottom_type" value="html" {% if config.bottom_ad.type == 'html' %}checked{% endif %} onchange="toggleAdType('bottom')"> קוד Google AdSense / HTML</label>
             </div>
         </div>
 
         <div id="bottom_custom_fields" style="display: {% if config.bottom_ad.type == 'custom' %}block{% else %}none{% endif %};">
             <label class="window-label">🔗 קישור ישיר לתמונת הבאנר (Image URL):</label>
-            <input type="text" name="bottom_image_url" value="{{ config.bottom_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner2.jpg">
+            <input type="text" name="bottom_image_url" value="{{ config.bottom_ad.image_url }}" class="input-modern" placeholder="https://example.com/banner2.jpg" style="margin-bottom: 12px;">
 
-            <label class="window-label">🌐 קישור לאתר היעד (כשלוחצים על התמונה):</label>
-            <input type="text" name="bottom_link_url" value="{{ config.bottom_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il">
+            <label class="window-label">🌐 קישור יעד (כשלוחצים על הבאנר):</label>
+            <input type="text" name="bottom_link_url" value="{{ config.bottom_ad.link_url }}" class="input-modern" placeholder="https://mywebsite.co.il" style="margin-bottom: 12px;">
 
             <label class="window-label">טקסט תיאור (Alt Text):</label>
             <input type="text" name="bottom_alt_text" value="{{ config.bottom_ad.alt_text }}" class="input-modern" placeholder="פרסומת">
@@ -87,18 +97,18 @@
 
         <div id="bottom_html_fields" style="display: {% if config.bottom_ad.type == 'html' %}block{% else %}none{% endif %};">
             <label class="window-label">📜 קוד HTML / סקריפט מ-AdSense:</label>
-            <textarea name="bottom_html_code" style="height: 120px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.bottom_ad.html_code }}</textarea>
+            <textarea name="bottom_html_code" style="height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 13px;" placeholder="הדבק כאן את קוד ה-HTML של הפרסומת...">{{ config.bottom_ad.html_code }}</textarea>
         </div>
     </div>
 
     <!-- שינוי סיסמה -->
-    <div class="admin-card">
-        <h3>🔑 שינוי סיסמת מנהל</h3>
+    <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 24px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: #ffffff; margin-top: 0; margin-bottom: 12px;">🔑 שינוי סיסמת מנהל</h3>
         <label class="window-label">סיסמה חדשה (השאר ריק כדי לשמור על הסיסמה הנוכחית):</label>
         <input type="password" name="new_password" class="input-modern" placeholder="הכנס סיסמה חדשה...">
     </div>
 
-    <button type="submit" class="submit-btn" style="font-size: 18px; padding: 18px;">💾 שמור את כל הגדרות הפרסומות</button>
+    <button type="submit" class="submit-btn" style="font-size: 17px; padding: 18px;">💾 שמור את כל הגדרות הפרסומות</button>
 </form>
 {% endif %}
 {% endblock %}
