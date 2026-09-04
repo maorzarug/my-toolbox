@@ -131,14 +131,23 @@
                 </div>
             {% endif %}
 
-            <!-- Header Info for Subpages -->
-            {% if current_page != 'dashboard' %}
-            <div class="tool-header-container">
+            <!-- Header Info -->
+            <div class="tool-header-container" style="text-align: center; margin-bottom: 28px;">
                 <div class="tool-header-badge">⚡ ToolHub Digital Pro</div>
-                <h1>{{ title }}</h1>
-                <div class="description">{{ description }}</div>
+                <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -0.8px; margin-bottom: 6px;">{{ title }}</h1>
+                
+                <!-- Large Centered Logo Directly Underneath "דף הבית" -->
+                {% if current_page == 'dashboard' %}
+                <div style="margin: 20px auto 16px auto; text-align: center; display: flex; justify-content: center; align-items: center;">
+                    <div style="position: relative; display: inline-block;">
+                        <div style="position: absolute; inset: -15px; background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 70%); border-radius: 40px; filter: blur(20px); z-index: 0;"></div>
+                        <img src="/icon.png" alt="ToolHub Logo" style="width: 260px; height: 260px; max-width: 85vw; object-fit: contain; border-radius: 32px; border: 2px solid rgba(56, 189, 248, 0.4); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7); position: relative; z-index: 1; background: rgba(9, 11, 18, 0.85); display: block; margin: 0 auto;">
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="description" style="color: var(--text-secondary); font-size: 15px; max-width: 620px; margin: 0 auto; line-height: 1.6;">{{ description }}</div>
             </div>
-            {% endif %}
 
             <!-- Page Specific Container -->
             <div class="container-card">
