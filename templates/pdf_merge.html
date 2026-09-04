@@ -1,40 +1,123 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<!-- PDF-Lib for Client-Side Fast Merging (No File Size Limits) -->
+<script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
+{% endblock %}
+
 {% block content %}
-<form action="/action/pdf-merge" method="POST" enctype="multipart/form-data" style="text-align: right;" id="mergeForm">
+<div style="text-align: right;">
     <div class="file-dropzone" onclick="document.getElementById('pdfMergeFiles').click()">
         <div class="dropzone-icon">📄</div>
         <div class="dropzone-title">לחץ או גרור לכאן קובצי PDF למיזוג</div>
-        <div class="dropzone-sub">ניתן לבחור מספר קבצים בו-זמנית (הקבצים יאוחדו לפי הסדר)</div>
-        <input type="file" id="pdfMergeFiles" name="files" accept=".pdf" multiple style="display: none;" onchange="updateFileCount(this, 'fileCountMerge')">
+        <div class="dropzone-sub">ניתן לבחור מספר קבצים בו-זמנית • ללא מגבלת נפח • מהירות שיא</div>
+        <input type="file" id="pdfMergeFiles" accept=".pdf" multiple style="display: none;" onchange="handleMergeFiles(this)">
         <div id="fileCountMerge"></div>
     </div>
+
+    <!-- Selected files list -->
+    <div id="selectedFilesList" style="display: none; margin-bottom: 20px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 16px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px;">רשימת הקבצים לאיחוד (לפי הסדר):</div>
+        <div id="fileItemsContainer" style="display: flex; flex-direction: column; gap: 6px;"></div>
+    </div>
     
-    <button type="submit" class="submit-btn" id="mergeSubmitBtn">
+    <button type="button" class="submit-btn" id="mergeSubmitBtn" onclick="startClientMerge()">
         📑 מזג את כל הקבצים למסמך אחד
     </button>
-</form>
+
+    <!-- Progress Indicator -->
+    <div id="mergeProgress" style="display: none; margin-top: 20px; text-align: center; background: rgba(0,0,0,0.3); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+        <div style="font-size: 14px; font-weight: 700; color: #ffffff;" id="mergeStatusText">⏳ מאחד קבצים...</div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-const form = document.getElementById('mergeForm');
-if (form) {
-    form.addEventListener('submit', (e) => {
-        const files = document.getElementById('pdfMergeFiles');
-        if (!files || files.files.length === 0) {
-            e.preventDefault();
-            showToast('אנא בחר לפחות קובץ PDF אחד למיזוג', 'warning');
-            return;
-        }
-        const btn = document.getElementById('mergeSubmitBtn');
-        btn.innerHTML = '⏳ ממזג קבצים... אנא המתן';
-        btn.disabled = true;
-        setTimeout(() => {
-            btn.innerHTML = '📑 מזג את כל הקבצים למסמך אחד';
-            btn.disabled = false;
-        }, 4000);
+let mergeFilesList = [];
+
+function handleMergeFiles(input) {
+    if (input.files && input.files.length > 0) {
+        mergeFilesList = Array.from(input.files);
+        renderFilesList();
+        updateFileCount(input, 'fileCountMerge');
+        showToast(`${mergeFilesList.length} קבצים נבחרו`);
+    }
+}
+
+function renderFilesList() {
+    const container = document.getElementById('fileItemsContainer');
+    const wrapper = document.getElementById('selectedFilesList');
+    if (!container || !wrapper) return;
+
+    if (mergeFilesList.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+    }
+
+    wrapper.style.display = 'block';
+    container.innerHTML = '';
+
+    mergeFilesList.forEach((file, idx) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; font-size: 13px; border: 1px solid rgba(255,255,255,0.05);';
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        item.innerHTML = `
+            <span style="color: #fff;">📄 <strong>${idx + 1}.</strong> ${file.name}</span>
+            <span style="color: var(--text-muted); font-family: monospace;">${sizeMB} MB</span>
+        `;
+        container.appendChild(item);
     });
+}
+
+async function startClientMerge() {
+    if (mergeFilesList.length < 2) {
+        showToast('אנא בחר לפחות 2 קובצי PDF למיזוג', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('mergeSubmitBtn');
+    const progress = document.getElementById('mergeProgress');
+    const statusText = document.getElementById('mergeStatusText');
+
+    btn.disabled = true;
+    progress.style.display = 'block';
+
+    try {
+        const mergedPdf = await PDFLib.PDFDocument.create();
+
+        for (let i = 0; i < mergeFilesList.length; i++) {
+            const file = mergeFilesList[i];
+            statusText.innerText = `⏳ מאחד קובץ ${i + 1} מתוך ${mergeFilesList.length}: ${file.name}...`;
+            const arrayBuffer = await file.arrayBuffer();
+            const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+            const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+            copiedPages.forEach((page) => mergedPdf.addPage(page));
+        }
+
+        statusText.innerText = '⚡ שומר קובץ מאוחד...';
+        const mergedBytes = await mergedPdf.save();
+        const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'merged_document.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        progress.style.display = 'none';
+        btn.disabled = false;
+        showToast('כל הקבצים מוזגו בהצלחה והקובץ הורד!');
+
+    } catch (err) {
+        console.error('Merge error:', err);
+        progress.style.display = 'none';
+        btn.disabled = false;
+        alert('אירעה שגיאה במיזוג: ' + err.message);
+    }
 }
 </script>
 {% endblock %}

@@ -1,40 +1,122 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<!-- PDF.js & JSZip for Fast Client-Side PDF Page Extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+{% endblock %}
+
 {% block content %}
-<form action="/action/pdf-to-img" method="POST" enctype="multipart/form-data" style="text-align: right;" id="pdfToImgForm">
+<div style="text-align: right;">
     <div class="file-dropzone" onclick="document.getElementById('pdfToImgFile').click()">
         <div class="dropzone-icon">🖼️</div>
         <div class="dropzone-title">לחץ או גרור לכאן קובץ PDF לפירוק לתמונות</div>
-        <div class="dropzone-sub">כל דפי המסמך יחולצו כתמונות JPEG נפרדות בתוך ארכיון ZIP</div>
-        <input type="file" id="pdfToImgFile" name="file" accept=".pdf" style="display: none;" onchange="updateFileCount(this, 'fileCountPdfImg')">
+        <div class="dropzone-sub">ללא הגבלת נפח • כל דפי המסמך יחולצו כתמונות JPEG ב-ZIP ישירות במחשב שלך</div>
+        <input type="file" id="pdfToImgFile" accept=".pdf" style="display: none;" onchange="handleFileSelect(this)">
         <div id="fileCountPdfImg"></div>
     </div>
     
-    <button type="submit" class="submit-btn" id="extractSubmitBtn">
+    <button type="button" class="submit-btn" id="extractSubmitBtn" onclick="startClientExtraction()">
         📦 חלץ דפים לתמונות והורד ZIP
     </button>
-</form>
+
+    <!-- Progress Indicator -->
+    <div id="extractProgress" style="display: none; margin-top: 20px; text-align: center; background: rgba(0,0,0,0.3); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-subtle);">
+        <div style="font-size: 14px; font-weight: 700; color: #ffffff;" id="extractStatusText">⏳ מפרק דפים לתמונות...</div>
+        <div style="width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: var(--radius-full); overflow: hidden; margin-top: 10px;">
+            <div id="extractProgressBar" style="width: 0%; height: 100%; background: var(--accent-gradient); transition: width 0.2s;"></div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-const form = document.getElementById('pdfToImgForm');
-if (form) {
-    form.addEventListener('submit', (e) => {
-        const file = document.getElementById('pdfToImgFile');
-        if (!file || file.files.length === 0) {
-            e.preventDefault();
-            showToast('אנא בחר קובץ PDF לפירוק לתמונות', 'warning');
-            return;
+if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+let selectedPdfToImgFile = null;
+
+function handleFileSelect(input) {
+    updateFileCount(input, 'fileCountPdfImg');
+    if (input.files && input.files[0]) {
+        selectedPdfToImgFile = input.files[0];
+        showToast('קובץ נבחר בהצלחה!');
+    }
+}
+
+async function startClientExtraction() {
+    if (!selectedPdfToImgFile) {
+        showToast('אנא בחר קובץ PDF תחילה', 'warning');
+        return;
+    }
+
+    const btn = document.getElementById('extractSubmitBtn');
+    const progress = document.getElementById('extractProgress');
+    const statusText = document.getElementById('extractStatusText');
+    const bar = document.getElementById('extractProgressBar');
+
+    btn.disabled = true;
+    progress.style.display = 'block';
+    bar.style.width = '5%';
+
+    try {
+        const arrayBuffer = await selectedPdfToImgFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const numPages = pdf.numPages;
+
+        const zip = new JSZip();
+
+        for (let i = 1; i <= numPages; i++) {
+            const pct = Math.round((i / numPages) * 90);
+            bar.style.width = `${pct}%`;
+            statusText.innerText = `⏳ מחלץ תמונה מעמוד ${i} מתוך ${numPages}...`;
+
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 2.0 }); // High-res 2x
+
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+            const imgDataUrl = canvas.toDataURL('image/jpeg', 0.90);
+            const base64Data = imgDataUrl.split(',')[1];
+            zip.file(`page_${i}.jpg`, base64Data, { base64: true });
         }
-        const btn = document.getElementById('extractSubmitBtn');
-        btn.innerHTML = '⏳ מחלץ תמונות ומייצר ZIP... אנא המתן';
-        btn.disabled = true;
+
+        statusText.innerText = '⚡ אורז תמונות לקובץ ZIP...';
+        bar.style.width = '98%';
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = selectedPdfToImgFile.name.replace(/\.[^/.]+$/, "") + "_images.zip";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        bar.style.width = '100%';
         setTimeout(() => {
-            btn.innerHTML = '📦 חלץ דפים לתמונות והורד ZIP';
+            progress.style.display = 'none';
             btn.disabled = false;
-        }, 5000);
-    });
+            showToast('כל התמונות חולצו לקובץ ZIP בהצלחה!');
+        }, 500);
+
+    } catch (err) {
+        console.error('Extract error:', err);
+        progress.style.display = 'none';
+        btn.disabled = false;
+        alert('אירעה שגיאה בחילוץ תמונות: ' + err.message);
+    }
 }
 </script>
 {% endblock %}

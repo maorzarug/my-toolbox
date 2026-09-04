@@ -1,89 +1,278 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<!-- PDF.js and PDF-Lib for 100% Client-Side Super Fast Compression (No 4.5MB Server Limits) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
+{% endblock %}
+
 {% block content %}
-<form action="/action/pdf-compress" method="POST" enctype="multipart/form-data" style="text-align: right;" id="compressForm">
-    <div class="file-dropzone" onclick="document.getElementById('pdfCompressFile').click()">
+<div style="text-align: right;">
+    <!-- Upload Dropzone -->
+    <div class="file-dropzone" id="dropzoneBox" onclick="document.getElementById('pdfCompressFile').click()">
         <div class="dropzone-icon">🗜️</div>
         <div class="dropzone-title">לחץ או גרור לכאן מסמך PDF לדחיסה</div>
-        <div class="dropzone-sub">מותאם במיוחד למסמכים סרוקים, תלושי שכר וטפסים רשמיים</div>
-        <input type="file" id="pdfCompressFile" name="file" accept=".pdf" style="display: none;" onchange="updateFileCount(this, 'fileCountCompress')">
+        <div class="dropzone-sub">ללא הגבלת נפח • מעבד ישירות במחשב שלך במהירות שיא ובפרטיות מלאה</div>
+        <input type="file" id="pdfCompressFile" accept=".pdf" style="display: none;" onchange="handleFileSelect(this)">
         <div id="fileCountCompress"></div>
     </div>
 
+    <!-- Compression Level Selector -->
     <label class="window-label" style="margin-top: 24px; margin-bottom: 12px;">🎯 בחר רמת דחיסה מבוקשת:</label>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px;">
         <label class="btn-action active" style="flex-direction: column; align-items: flex-start; padding: 14px; border-radius: var(--radius-lg); cursor: pointer; text-align: right;" id="level-card-rec">
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 4px;">
                 <span style="font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 6px;">
-                    <input type="radio" name="level" value="recommended" checked style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
+                    <input type="radio" name="compressionLevel" value="recommended" checked style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
                     דחיסה מומלצת
                 </span>
                 <span class="tool-tag" style="background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan);">70%-90% חיסכון</span>
             </div>
-            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">אידיאלי לביטוח לאומי, מס הכנסה, ומשלוח במייל. שומר על קריאות מלאה.</span>
+            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">אידיאלי לביטוח לאומי, מס הכנסה, ומשלוח במייל. שומר על קריאות וחדות מעולה.</span>
         </label>
 
         <label class="btn-action" style="flex-direction: column; align-items: flex-start; padding: 14px; border-radius: var(--radius-lg); cursor: pointer; text-align: right;" id="level-card-high">
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 4px;">
                 <span style="font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 6px;">
-                    <input type="radio" name="level" value="high" style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
+                    <input type="radio" name="compressionLevel" value="high" style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
                     דחיסה מקסימלית
                 </span>
                 <span class="tool-tag">נפח מינימלי</span>
             </div>
-            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">למסמכים ענקיים במיוחד שחייבים לרדת מתחת לסף נוקשה (למשל 2MB).</span>
+            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">למסמכים ענקיים במיוחד שחייבים לרדת מתחת לסף נוקשה (כגון 2MB).</span>
         </label>
 
         <label class="btn-action" style="flex-direction: column; align-items: flex-start; padding: 14px; border-radius: var(--radius-lg); cursor: pointer; text-align: right;" id="level-card-light">
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 4px;">
                 <span style="font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 6px;">
-                    <input type="radio" name="level" value="light" style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
+                    <input type="radio" name="compressionLevel" value="light" style="accent-color: var(--accent-cyan);" onchange="updateLevelCard(this)">
                     דחיסה עדינה
                 </span>
                 <span class="tool-tag">איכות שיא</span>
             </div>
-            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">שמירה על איכות רזולוציה מקסימלית עם אופטימיזציה קלה.</span>
+            <span style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">שמירה על איכות רזולוציה גבוהה במיוחד עם דחיסה קלה.</span>
         </label>
     </div>
 
-    <div style="background: rgba(56, 189, 248, 0.05); border: 1px dashed rgba(56, 189, 248, 0.2); padding: 16px; border-radius: var(--radius-lg); font-size: 13px; color: var(--text-secondary); margin-bottom: 15px; display: flex; align-items: center; gap: 12px;">
+    <!-- Government Badge Tip -->
+    <div style="background: rgba(56, 189, 248, 0.05); border: 1px dashed rgba(56, 189, 248, 0.2); padding: 16px; border-radius: var(--radius-lg); font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
         <span style="font-size: 24px;">🏛️</span>
         <div>
-            <strong style="color: #ffffff;">מוכן להעלאה לאתרים ממשלתיים:</strong> המנוע החכם ממטב את התמונות הסרוקות ומבטיח שהקובץ יעבור חלק את סינון הגודל באתרי הממשלה (Gov.il).
+            <strong style="color: #ffffff;">מוכן להעלאה לאתרים ממשלתיים:</strong> המנוע ממטב את כל דפי המסמך ישירות במכשיר שלך כך שהוא יעבור חלק ב-Gov.il ובביטוח לאומי.
         </div>
     </div>
 
-    <button type="submit" class="submit-btn" id="compressSubmitBtn">
-        ⚡ דחוס מסמך והורד קובץ מוכן
+    <!-- Start Button -->
+    <button type="button" class="submit-btn" id="compressBtn" onclick="startClientCompression()">
+        ⚡ דחוס מסמך PDF עכשיו
     </button>
-</form>
+
+    <!-- Progress Indicator Container -->
+    <div id="progressContainer" style="display: none; margin-top: 24px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; text-align: center;">
+        <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 12px;" id="progressStatusText">
+            ⏳ מתחיל עיבוד ואופטימיזציה...
+        </div>
+        <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 8px;">
+            <div id="progressBar" style="width: 0%; height: 100%; background: var(--accent-gradient); transition: width 0.25s ease;"></div>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);" id="progressSubText">מעבד עמודים...</div>
+    </div>
+
+    <!-- Results Success Card -->
+    <div id="resultCard" style="display: none; margin-top: 24px; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-xl); padding: 28px; text-align: center;">
+        <div style="font-size: 40px; margin-bottom: 8px;">🎉</div>
+        <h3 style="font-size: 22px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">הקובץ נדחס בהצלחה!</h3>
+        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">המסמך שלך מוכן כעת להורדה ולמשלוח לכל אתר ממשלתי או במייל.</p>
+
+        <!-- Stats Grid -->
+        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;">
+            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 12px; color: var(--text-muted);">נפח מקורי</div>
+                <div style="font-size: 18px; font-weight: 800; color: #ffffff; font-family: 'JetBrains Mono', monospace;" id="origSizeDisplay">0 MB</div>
+            </div>
+            <div style="background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 12px; color: var(--text-muted);">נפח לאחר דחיסה</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--accent-cyan); font-family: 'JetBrains Mono', monospace;" id="compSizeDisplay">0 MB</div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.15); padding: 12px 20px; border-radius: var(--radius-md); border: 1px solid rgba(16, 185, 129, 0.3);">
+                <div style="font-size: 12px; color: var(--success);">אחוז חיסכון</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--success); font-family: 'JetBrains Mono', monospace;" id="savingsDisplay">0%</div>
+            </div>
+        </div>
+
+        <button type="button" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669); font-size: 17px; max-width: 360px; margin: 0 auto 12px auto;" onclick="downloadCompressedFile()">
+            💾 הורד קובץ PDF דחוס
+        </button>
+        <button type="button" class="btn-action" style="margin: 0 auto;" onclick="resetCompressionUI()">
+            🔄 דחוס קובץ נוסף
+        </button>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+// Configure PDF.js Worker
+if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+let selectedPdfFile = null;
+let compressedPdfBlob = null;
+let compressedFileName = 'compressed_document.pdf';
+
 function updateLevelCard(radio) {
     document.querySelectorAll('[id^="level-card-"]').forEach(card => card.classList.remove('active'));
     radio.closest('label').classList.add('active');
 }
 
-const form = document.getElementById('compressForm');
-if (form) {
-    form.addEventListener('submit', (e) => {
-        const file = document.getElementById('pdfCompressFile');
-        if (!file || file.files.length === 0) {
-            e.preventDefault();
-            showToast('אנא בחר קובץ PDF לדחיסה תחילה', 'warning');
-            return;
+function handleFileSelect(input) {
+    updateFileCount(input, 'fileCountCompress');
+    if (input.files && input.files.length > 0) {
+        selectedPdfFile = input.files[0];
+        document.getElementById('resultCard').style.display = 'none';
+        document.getElementById('progressContainer').style.display = 'none';
+        showToast('קובץ נבחר בהצלחה!');
+    }
+}
+
+async function startClientCompression() {
+    if (!selectedPdfFile) {
+        showToast('אנא בחר קובץ PDF לדחיסה תחילה', 'warning');
+        return;
+    }
+
+    const levelRadio = document.querySelector('input[name="compressionLevel"]:checked');
+    const level = levelRadio ? levelRadio.value : 'recommended';
+
+    // UI state
+    const compressBtn = document.getElementById('compressBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressStatusText = document.getElementById('progressStatusText');
+    const progressSubText = document.getElementById('progressSubText');
+    const resultCard = document.getElementById('resultCard');
+
+    compressBtn.disabled = true;
+    resultCard.style.display = 'none';
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '5%';
+    progressStatusText.innerText = '⏳ טוען את מסמך ה-PDF...';
+    progressSubText.innerText = 'מכין אופטימיזציה ללא מגבלת נפח';
+
+    try {
+        const arrayBuffer = await selectedPdfFile.arrayBuffer();
+        const origSize = selectedPdfFile.size;
+
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
+        const numPages = pdf.numPages;
+
+        const newPdfDoc = await PDFLib.PDFDocument.create();
+
+        // Level parameters
+        let scale = 1.35; // ~135 DPI (crisp text, huge reduction)
+        let quality = 0.60;
+        if (level === 'high') {
+            scale = 1.0;  // 100 DPI (minimum payload)
+            quality = 0.40;
+        } else if (level === 'light') {
+            scale = 1.75; // 175 DPI (maximum fidelity)
+            quality = 0.78;
         }
-        const btn = document.getElementById('compressSubmitBtn');
-        btn.innerHTML = '⏳ דוחס וממטב את המסמך... אנא המתן';
-        btn.disabled = true;
+
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            const pct = Math.round((pageNum / numPages) * 90);
+            progressBar.style.width = `${pct}%`;
+            progressStatusText.innerText = `⏳ מעבד עמוד ${pageNum} מתוך ${numPages}...`;
+            progressSubText.innerText = `ממטב תמונות וסריקות ברמת דחיסה חכמה`;
+
+            const page = await pdf.getPage(pageNum);
+            const viewport = page.getViewport({ scale: scale });
+
+            const canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            const ctx = canvas.getContext('2d');
+
+            // White background for transparent/scanned pages
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+            const imgDataUrl = canvas.toDataURL('image/jpeg', quality);
+            const imgBytes = await fetch(imgDataUrl).then(res => res.arrayBuffer());
+
+            const embeddedImg = await newPdfDoc.embedJpg(imgBytes);
+
+            // Maintain original physical point dimensions
+            const unscaledViewport = page.getViewport({ scale: 1.0 });
+            const newPage = newPdfDoc.addPage([unscaledViewport.width, unscaledViewport.height]);
+            newPage.drawImage(embeddedImg, {
+                x: 0,
+                y: 0,
+                width: unscaledViewport.width,
+                height: unscaledViewport.height
+            });
+        }
+
+        progressStatusText.innerText = '⚡ מסיים בניית קובץ PDF דחוס...';
+        progressBar.style.width = '98%';
+
+        const compressedPdfBytes = await newPdfDoc.save();
+        compressedPdfBlob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+        const compSize = compressedPdfBytes.byteLength;
+
+        // Calculate Stats
+        const origMB = (origSize / (1024 * 1024)).toFixed(2);
+        const compMB = (compSize / (1024 * 1024)).toFixed(2);
+        const reduction = Math.max(0, Math.round((1 - compSize / origSize) * 100));
+
+        compressedFileName = selectedPdfFile.name.replace(/\.[^/.]+$/, "") + "_compressed.pdf";
+
+        // Update Result UI
+        document.getElementById('origSizeDisplay').innerText = `${origMB} MB`;
+        document.getElementById('compSizeDisplay').innerText = `${compMB} MB`;
+        document.getElementById('savingsDisplay').innerText = `${reduction}%`;
+
+        progressBar.style.width = '100%';
         setTimeout(() => {
-            btn.innerHTML = '⚡ דחוס מסמך והורד קובץ מוכן';
-            btn.disabled = false;
-        }, 4000);
-    });
+            progressContainer.style.display = 'none';
+            resultCard.style.display = 'block';
+            compressBtn.disabled = false;
+            showToast(`הדחיסה הושלמה! נחסכו ${reduction}% מהנפח`);
+        }, 500);
+
+    } catch (err) {
+        console.error('Client-side compression error:', err);
+        progressContainer.style.display = 'none';
+        compressBtn.disabled = false;
+        alert('אירעה שגיאה בעיבוד הקובץ: ' + err.message);
+    }
+}
+
+function downloadCompressedFile() {
+    if (!compressedPdfBlob) return;
+    const url = URL.createObjectURL(compressedPdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = compressedFileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('הקובץ הורד בהצלחה!');
+}
+
+function resetCompressionUI() {
+    selectedPdfFile = null;
+    compressedPdfBlob = null;
+    document.getElementById('pdfCompressFile').value = '';
+    document.getElementById('fileCountCompress').innerHTML = '';
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('progressContainer').style.display = 'none';
 }
 </script>
 {% endblock %}
