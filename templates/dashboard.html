@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Grand Hero Brand Showcase (Centered in Middle of Page) -->
+<div style="text-align: center; margin-bottom: 35px; padding: 10px 0;">
+    <!-- Large Central Glowing 3D Logo -->
+    <div style="display: inline-block; position: relative; margin-bottom: 18px;">
+        <div style="position: absolute; inset: -15px; background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 70%); border-radius: 40px; filter: blur(20px); z-index: 0;"></div>
+        <img src="/icon.png" alt="ToolHub Logo" style="width: 220px; height: 220px; max-width: 85vw; object-fit: contain; border-radius: 32px; border: 1.5px solid rgba(56, 189, 248, 0.4); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7); position: relative; z-index: 1; background: rgba(9, 11, 18, 0.85); display: block; margin: 0 auto; transition: transform 0.3s ease;">
+    </div>
+
+    <!-- Hero Title & Subtitle -->
+    <h1 style="font-size: 42px; font-weight: 900; letter-spacing: -1.2px; margin-bottom: 10px; line-height: 1.1;">
+        <span style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ToolHub</span>
+    </h1>
+    <div style="font-size: 16px; color: var(--text-secondary); max-width: 580px; margin: 0 auto 12px auto; line-height: 1.6;">
+        ארגז הכלים הדיגיטלי המתקדם – עיבוד PDF, תמונות, ניקוד וטקסט בחינם ובמהירות שיא
+    </div>
+    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); color: var(--accent-cyan); font-size: 12.5px; font-weight: 700; border-radius: 9999px;">
+        ✨ 10 כלים מקצועיים ללא צורך בהרשמה
+    </div>
+</div>
+
 <!-- Hero Live Search Box -->
 <div class="hero-search-box">
     <input type="text" id="toolSearchInput" class="hero-search-input" placeholder="🔍 חפש כלי עבודה מהיר... (הקלד 'PDF', 'דחיסה', 'ניקוד', 'וואטסאפ'...)" oninput="filterTools()">
