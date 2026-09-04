@@ -26,6 +26,10 @@
     <meta name="twitter:description" content="{{ description }}">
     <meta name="twitter:image" content="{{ request.host_url }}icon.png">
 
+    <!-- Global CDNs for Client-Side Fast Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
+
     <!-- Google Fonts & Stylesheet -->
     <link rel="stylesheet" href="/static/css/style.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821768397488065" crossorigin="anonymous"></script>
@@ -136,12 +140,18 @@
                 <div class="tool-header-badge">⚡ ToolHub Digital Pro</div>
                 <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -0.8px; margin-bottom: 6px;">{{ title }}</h1>
                 
-                <!-- Large Centered Logo Directly Underneath "דף הבית" -->
+                <!-- Large Centered Logo Directly Underneath "דף הבית" - No Black Margins -->
                 {% if current_page == 'dashboard' %}
-                <div style="margin: 20px auto 16px auto; text-align: center; display: flex; justify-content: center; align-items: center;">
+                <div style="margin: 18px auto 14px auto; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div style="position: relative; display: inline-block;">
-                        <div style="position: absolute; inset: -15px; background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 70%); border-radius: 40px; filter: blur(20px); z-index: 0;"></div>
-                        <img src="/icon.png" alt="ToolHub Logo" style="width: 260px; height: 260px; max-width: 85vw; object-fit: contain; border-radius: 32px; border: 2px solid rgba(56, 189, 248, 0.4); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7); position: relative; z-index: 1; background: rgba(9, 11, 18, 0.85); display: block; margin: 0 auto;">
+                        <img src="/icon.png" alt="ToolHub Logo" style="width: 240px; height: auto; max-width: 85vw; object-fit: contain; border-radius: 26px; filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.45)); border: 1px solid rgba(56, 189, 248, 0.35); display: block; margin: 0 auto;">
+                    </div>
+
+                    <!-- Add to Favorites / Shortcut Button -->
+                    <div style="margin-top: 14px;">
+                        <button type="button" class="btn-action" onclick="addToFavoritesOrHomescreen()" style="background: rgba(56, 189, 248, 0.08); border-color: rgba(56, 189, 248, 0.3); color: #ffffff; padding: 7px 18px; font-size: 13px; font-weight: 700; border-radius: 9999px;">
+                            ⭐ הוסף למועדפים / קיצור דרך במסך הבית
+                        </button>
                     </div>
                 </div>
                 {% endif %}
@@ -172,7 +182,61 @@
         </div>
     </main>
 
+    <!-- Modal for iOS / Bookmark Instructions -->
+    <div id="bookmarkModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 3000; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: #121624; border: 1px solid var(--accent-cyan); border-radius: 20px; padding: 28px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            <div style="font-size: 40px; margin-bottom: 12px;">📱</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 10px;" id="bookmarkModalTitle">הוספה למסך הבית</h3>
+            <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;" id="bookmarkModalText">
+                לחץ על כפתור השיתוף בתחתית המסך ובחר באפשרות <strong>"הוסף למסך הבית" ➕</strong> לקבלת גישה מהירה כמו אפליקציה!
+            </p>
+            <button type="button" class="submit-btn" style="width: auto; padding: 10px 30px; margin: 0 auto;" onclick="closeBookmarkModal()">הבנתי, תודה!</button>
+        </div>
+    </div>
+
     <script src="/static/js/main.js"></script>
+    <script>
+    // PWA Install Prompt Listener
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+    });
+
+    function addToFavoritesOrHomescreen() {
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            deferredInstallPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    showToast('האפליקציה נוספה למסך הבית בהצלחה!');
+                }
+                deferredInstallPrompt = null;
+            });
+            return;
+        }
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        if (isIOS) {
+            document.getElementById('bookmarkModalTitle').innerText = '📱 הוספה למסך הבית באייפון / אייפד';
+            document.getElementById('bookmarkModalText').innerHTML = 'לחץ על סמל השיתוף בתחתית הדפדפן <strong>(⎋)</strong><br>ולאחר מכן בחר <strong>"הוסף למסך הבית" ➕</strong>';
+            document.getElementById('bookmarkModal').style.display = 'flex';
+        } else if (isAndroid) {
+            document.getElementById('bookmarkModalTitle').innerText = '📱 הוספה למסך הבית באנדרואיד';
+            document.getElementById('bookmarkModalText').innerHTML = 'לחץ על 3 הנקודות בראש הדפדפן (⋮)<br>ובחר <strong>"הוסף למסך הבית" 📲</strong>';
+            document.getElementById('bookmarkModal').style.display = 'flex';
+        } else {
+            // Desktop
+            navigator.clipboard.writeText(window.location.href);
+            showToast('הקישור הועתק! לחץ Ctrl + D להוספה מהירה למועדפים ⭐');
+        }
+    }
+
+    function closeBookmarkModal() {
+        document.getElementById('bookmarkModal').style.display = 'none';
+    }
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 
-{% block extra_head %}
-<!-- PDF.js and PDF-Lib for 100% Client-Side Super Fast Compression (No 4.5MB Server Limits) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://unpkg.com/pdf-lib@1.17.9/dist/pdf-lib.min.js"></script>
-{% endblock %}
-
 {% block content %}
 <div style="text-align: right;">
     <!-- Upload Dropzone -->
@@ -143,6 +137,13 @@ async function startClientCompression() {
         return;
     }
 
+    // Ensure PDFLib is loaded
+    const PDFLibObj = window.PDFLib || (typeof PDFLib !== 'undefined' ? PDFLib : null);
+    if (!PDFLibObj || !PDFLibObj.PDFDocument) {
+        alert('ספריית ה-PDF נטענת כעת בדפדפן, אנא המתן מספר שניות ולחץ שוב.');
+        return;
+    }
+
     const levelRadio = document.querySelector('input[name="compressionLevel"]:checked');
     const level = levelRadio ? levelRadio.value : 'recommended';
 
@@ -169,7 +170,7 @@ async function startClientCompression() {
         const pdf = await loadingTask.promise;
         const numPages = pdf.numPages;
 
-        const newPdfDoc = await PDFLib.PDFDocument.create();
+        const newPdfDoc = await PDFLibObj.PDFDocument.create();
 
         // Level parameters
         let scale = 1.35; // ~135 DPI (crisp text, huge reduction)
