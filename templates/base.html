@@ -26,9 +26,11 @@
     <meta name="twitter:description" content="{{ description }}">
     <meta name="twitter:image" content="{{ request.host_url }}icon.png">
 
-    <!-- Global CDNs for Client-Side Fast Engine -->
+    <!-- High Performance Client-Side PDF Engines (Local + CDN Fallback) -->
+    <script src="/static/js/pdf.min.js"></script>
+    <script src="/static/js/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.9/pdf-lib.min.js"></script>
 
     <!-- Google Fonts & Stylesheet -->
     <link rel="stylesheet" href="/static/css/style.css">
@@ -63,7 +65,7 @@
                 </svg>
             </button>
             <a href="/" style="display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;">
-                <img src="/icon.png" alt="ToolHub" style="width: 32px; height: 32px; border-radius: 8px; object-fit: contain;">
+                <img src="/icon.png" alt="ToolHub" style="width: 32px; height: 32px; object-fit: contain;">
                 <div style="font-size: 20px; font-weight: 900; background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                     ToolHub
                 </div>
@@ -140,11 +142,11 @@
                 <div class="tool-header-badge">⚡ ToolHub Digital Pro</div>
                 <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -0.8px; margin-bottom: 6px;">{{ title }}</h1>
                 
-                <!-- Large Centered Logo Directly Underneath "דף הבית" - No Black Margins -->
+                <!-- Pure Floating 3D Logo (100% Transparent Background, No Black Frame/Bars) -->
                 {% if current_page == 'dashboard' %}
-                <div style="margin: 18px auto 14px auto; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div style="margin: 15px auto 14px auto; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div style="position: relative; display: inline-block;">
-                        <img src="/icon.png" alt="ToolHub Logo" style="width: 240px; height: auto; max-width: 85vw; object-fit: contain; border-radius: 26px; filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.45)); border: 1px solid rgba(56, 189, 248, 0.35); display: block; margin: 0 auto;">
+                        <img src="/icon.png" alt="ToolHub Logo" style="width: 220px; height: auto; max-width: 80vw; object-fit: contain; filter: drop-shadow(0 0 35px rgba(56, 189, 248, 0.5)); display: block; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
                     </div>
 
                     <!-- Add to Favorites / Shortcut Button -->

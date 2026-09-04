@@ -63,14 +63,17 @@
     </button>
 
     <!-- Progress Indicator Container -->
-    <div id="progressContainer" style="display: none; margin-top: 24px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; text-align: center;">
-        <div style="font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 12px;" id="progressStatusText">
+    <div id="progressContainer" style="display: none; margin-top: 24px; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px; text-align: center;">
+        <div style="font-size: 16px; font-weight: 800; color: #ffffff; margin-bottom: 12px;" id="progressStatusText">
             ⏳ מתחיל עיבוד ואופטימיזציה...
         </div>
-        <div style="width: 100%; height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 8px;">
-            <div id="progressBar" style="width: 0%; height: 100%; background: var(--accent-gradient); transition: width 0.25s ease;"></div>
+        <div style="width: 100%; height: 12px; background: rgba(255, 255, 255, 0.08); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div id="progressBar" style="width: 0%; height: 100%; background: linear-gradient(135deg, #38bdf8, #6366f1, #10b981); transition: width 0.25s ease;"></div>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted);" id="progressSubText">מעבד עמודים...</div>
+        <div style="display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+            <span id="progressSubText">מעבד עמודים...</span>
+            <span id="progressPctDisplay" style="color: var(--accent-cyan); font-weight: 700;">0%</span>
+        </div>
     </div>
 
     <!-- Results Success Card -->
@@ -107,11 +110,6 @@
 
 {% block scripts %}
 <script>
-// Configure PDF.js Worker
-if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
-
 let selectedPdfFile = null;
 let compressedPdfBlob = null;
 let compressedFileName = 'compressed_document.pdf';
@@ -131,16 +129,27 @@ function handleFileSelect(input) {
     }
 }
 
+// Helper to ensure PDF libraries are ready
+async function waitForPDFLibraries() {
+    let retries = 0;
+    while (retries < 50) {
+        const hasPDFLib = (window.PDFLib && window.PDFLib.PDFDocument) || (typeof PDFLib !== 'undefined' && PDFLib.PDFDocument);
+        const hasPdfjs = (typeof pdfjsLib !== 'undefined' && pdfjsLib.getDocument);
+        if (hasPDFLib && hasPdfjs) {
+            return {
+                PDFLib: window.PDFLib || PDFLib,
+                pdfjsLib: pdfjsLib
+            };
+        }
+        await new Promise(r => setTimeout(r, 100));
+        retries++;
+    }
+    throw new Error('טעינת ספריות העיבוד התעכבה. אנא רענן את העמוד ונסה שוב.');
+}
+
 async function startClientCompression() {
     if (!selectedPdfFile) {
         showToast('אנא בחר קובץ PDF לדחיסה תחילה', 'warning');
-        return;
-    }
-
-    // Ensure PDFLib is loaded
-    const PDFLibObj = window.PDFLib || (typeof PDFLib !== 'undefined' ? PDFLib : null);
-    if (!PDFLibObj || !PDFLibObj.PDFDocument) {
-        alert('ספריית ה-PDF נטענת כעת בדפדפן, אנא המתן מספר שניות ולחץ שוב.');
         return;
     }
 
@@ -153,20 +162,30 @@ async function startClientCompression() {
     const progressBar = document.getElementById('progressBar');
     const progressStatusText = document.getElementById('progressStatusText');
     const progressSubText = document.getElementById('progressSubText');
+    const progressPctDisplay = document.getElementById('progressPctDisplay');
     const resultCard = document.getElementById('resultCard');
 
     compressBtn.disabled = true;
     resultCard.style.display = 'none';
     progressContainer.style.display = 'block';
     progressBar.style.width = '5%';
-    progressStatusText.innerText = '⏳ טוען את מסמך ה-PDF...';
-    progressSubText.innerText = 'מכין אופטימיזציה ללא מגבלת נפח';
+    progressPctDisplay.innerText = '5%';
+    progressStatusText.innerText = '⏳ מכין מנוע אופטימיזציה...';
+    progressSubText.innerText = 'טוען מסמך PDF לעיבוד מהיר';
 
     try {
+        const libs = await waitForPDFLibraries();
+        const PDFLibObj = libs.PDFLib;
+        const pdfjs = libs.pdfjsLib;
+
+        if (pdfjs.GlobalWorkerOptions) {
+            pdfjs.GlobalWorkerOptions.workerSrc = '/static/js/pdf.worker.min.js';
+        }
+
         const arrayBuffer = await selectedPdfFile.arrayBuffer();
         const origSize = selectedPdfFile.size;
 
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
         const pdf = await loadingTask.promise;
         const numPages = pdf.numPages;
 
@@ -184,8 +203,9 @@ async function startClientCompression() {
         }
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-            const pct = Math.round((pageNum / numPages) * 90);
+            const pct = Math.round((pageNum / (numPages + 1)) * 100);
             progressBar.style.width = `${pct}%`;
+            progressPctDisplay.innerText = `${pct}%`;
             progressStatusText.innerText = `⏳ מעבד עמוד ${pageNum} מתוך ${numPages}...`;
             progressSubText.innerText = `ממטב תמונות וסריקות ברמת דחיסה חכמה`;
 
@@ -219,8 +239,9 @@ async function startClientCompression() {
             });
         }
 
-        progressStatusText.innerText = '⚡ מסיים בניית קובץ PDF דחוס...';
-        progressBar.style.width = '98%';
+        progressStatusText.innerText = '⚡ שומר קובץ PDF דחוס...';
+        progressBar.style.width = '96%';
+        progressPctDisplay.innerText = '96%';
 
         const compressedPdfBytes = await newPdfDoc.save();
         compressedPdfBlob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
@@ -239,12 +260,14 @@ async function startClientCompression() {
         document.getElementById('savingsDisplay').innerText = `${reduction}%`;
 
         progressBar.style.width = '100%';
+        progressPctDisplay.innerText = '100%';
+
         setTimeout(() => {
             progressContainer.style.display = 'none';
             resultCard.style.display = 'block';
             compressBtn.disabled = false;
             showToast(`הדחיסה הושלמה! נחסכו ${reduction}% מהנפח`);
-        }, 500);
+        }, 400);
 
     } catch (err) {
         console.error('Client-side compression error:', err);
