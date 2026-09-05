@@ -121,7 +121,7 @@ function updateLevelCard(radio) {
 
 function handleFileSelect(input) {
     updateFileCount(input, 'fileCountCompress');
-    if (input.files && input.files.length > 0) {
+    if (input.files && input.files[0]) {
         selectedPdfFile = input.files[0];
         document.getElementById('resultCard').style.display = 'none';
         document.getElementById('progressContainer').style.display = 'none';
@@ -129,22 +129,33 @@ function handleFileSelect(input) {
     }
 }
 
-// Helper to ensure PDF libraries are ready
-async function waitForPDFLibraries() {
-    let retries = 0;
-    while (retries < 50) {
-        const hasPDFLib = (window.PDFLib && window.PDFLib.PDFDocument) || (typeof PDFLib !== 'undefined' && PDFLib.PDFDocument);
-        const hasPdfjs = (typeof pdfjsLib !== 'undefined' && pdfjsLib.getDocument);
-        if (hasPDFLib && hasPdfjs) {
-            return {
-                PDFLib: window.PDFLib || PDFLib,
-                pdfjsLib: pdfjsLib
-            };
-        }
-        await new Promise(r => setTimeout(r, 100));
-        retries++;
+// Dynamically load PDF libraries if needed
+async function ensurePDFLibraries() {
+    if (typeof pdfjsLib === 'undefined') {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
     }
-    throw new Error('טעינת ספריות העיבוד התעכבה. אנא רענן את העמוד ונסה שוב.');
+    if (typeof PDFLib === 'undefined' && !window.PDFLib) {
+        await loadScript('https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js');
+    }
+
+    if (typeof pdfjsLib !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    return {
+        PDFLib: window.PDFLib || PDFLib,
+        pdfjs: pdfjsLib
+    };
+}
+
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
 }
 
 async function startClientCompression() {
@@ -174,13 +185,9 @@ async function startClientCompression() {
     progressSubText.innerText = 'טוען מסמך PDF לעיבוד מהיר';
 
     try {
-        const libs = await waitForPDFLibraries();
+        const libs = await ensurePDFLibraries();
         const PDFLibObj = libs.PDFLib;
-        const pdfjs = libs.pdfjsLib;
-
-        if (pdfjs.GlobalWorkerOptions) {
-            pdfjs.GlobalWorkerOptions.workerSrc = '/static/js/pdf.worker.min.js';
-        }
+        const pdfjs = libs.pdfjs;
 
         const arrayBuffer = await selectedPdfFile.arrayBuffer();
         const origSize = selectedPdfFile.size;
