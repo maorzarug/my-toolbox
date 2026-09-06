@@ -8,6 +8,7 @@ from services.ads_service import load_ads_config, save_ads_config
 from services.pdf_service import merge_pdfs, convert_pdf_to_images, compress_pdf
 from services.image_service import convert_image, resize_image, apply_effect
 from services.nikud_service import get_nikud
+from services.shabbat_service import get_shabbat_status
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'toolhub-secure-session-key-2026')
@@ -16,6 +17,31 @@ app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024  # 32MB upload limit
 # Global links
 PAYPAL_LINK = "https://www.paypal.me/zarug"
 CONTACT_EMAIL = "maor.zarug@gmail.com"
+
+# ==========================================
+# שומר שבת ומועדי ישראל (Shabbat Guard Middleware)
+# ==========================================
+@app.before_request
+def shabbat_guard():
+    # Allow static assets, admin dashboard, icon, and preview route
+    path = request.path
+    if (path.startswith('/static') or 
+        path.startswith('/admin') or 
+        path in ('/favicon.ico', '/icon.png', '/manifest.json', '/shabbat-preview', '/ads.txt')):
+        return None
+
+    # Check if Shabbat mode is enabled in config
+    cfg = load_ads_config()
+    shabbat_mode_enabled = cfg.get('shabbat_mode', True)
+
+    if shabbat_mode_enabled:
+        shabbat_info = get_shabbat_status()
+        if shabbat_info.get('is_shabbat'):
+            return render_template(
+                'shabbat.html',
+                event_title=shabbat_info.get('event_title', 'שבת קודש'),
+                havdalah_info=shabbat_info.get('havdalah_info', '')
+            ), 503
 
 # Context processor to inject ads and globals into all templates
 @app.context_processor
@@ -58,33 +84,42 @@ def pdf_to_img_page():
 
 @app.route('/pdf-compress')
 def pdf_compress_page():
-    return render_template('pdf_compress.html', current_page='pdf-compress', title='🗜️ דחיסת קבצי PDF', description='צמצם את נפח מסמכי ה-PDF והסריקות ב-70%-90% עבור אתרים ממשלתיים ושליחה במייל.')
+    return render_template('pdf_compress.html', current_page='pdf-compress', title='🗜️ דחיסת קבצי PDF', description='הקטנת נפח ודחיסת קובצי PDF וסריקות ב-70%-90% עבור אתרים ממשלתיים ומייל.')
 
 @app.route('/img-convert')
 def img_convert_page():
-    return render_template('img_convert.html', current_page='img-convert', title='🔄 המרת פורמט תמונה', description='שנה את סוג קובץ התמונה שלך לפורמט נפוץ אחר (PNG, JPEG, WEBP, BMP) מיידית.')
+    return render_template('img_convert.html', current_page='img-convert', title='🔄 המרת פורמט תמונה', description='המרת קובצי תמונה בין פורמטים מובילים: JPG, PNG, WEBP, ו-BMP.')
 
 @app.route('/img-resize')
 def img_resize_page():
-    return render_template('img_resize.html', current_page='img-resize', title='📐 שינוי גודל תמונה', description='התאם את ממדי הגובה והרוחב של התמונה בפיקסלים מדויקים.')
+    return render_template('img_resize.html', current_page='img-resize', title='📐 שינוי גודל תמונה', description='שינוי והתאמת רזולוציית תמונה לפיקסלים מוגדרים אישית בלחיצת כפתור.')
 
 @app.route('/img-effects')
 def img_effects_page():
-    return render_template('img_effects.html', current_page='img-effects', title='🎨 פילטרים ואפקטים לתמונות', description='עצב את התמונה עם פילטרים: טשטוש, שחור-לבן, רישום וחדות. כולל תצוגה מקדימה והורדה.')
+    return render_template('img_effects.html', current_page='img-effects', title='🎨 פילטרים ואפקטים לתמונות', description='החלת אפקטים מהירים: שחור-לבן, טשטוש, חידוד ושרטוט עם תצוגה מקדימה.')
 
 @app.route('/about')
-def about():
-    return render_template('about.html', current_page='about', title='ℹ️ אודות הפרויקט', description='הכירו את הסיפור מאחורי ToolHub ומדוע הקמנו אותו.')
+def about_page():
+    return render_template('about.html', current_page='about', title='ℹ️ אודות הפרויקט', description='הכירו את ToolHub ואת הדרך לתמוך בהמשך הפיתוח והתחזוקה של המערכת.')
+
+@app.route('/shabbat-preview')
+def shabbat_preview():
+    shabbat_info = get_shabbat_status()
+    return render_template(
+        'shabbat.html',
+        event_title=shabbat_info.get('event_title', 'שבת קודש - פרשת השבוע'),
+        havdalah_info=shabbat_info.get('havdalah_info', 'מוצאי שבת: 20:14')
+    )
 
 # ==========================================
-# מערכת ניהול פרסומות (Admin / Ad Management)
+# מערכת ניהול פרסומות והגדרות (Admin)
 # ==========================================
 
 @app.route('/admin')
 def admin_page():
     is_auth = session.get('admin_authenticated', False)
     cfg = load_ads_config()
-    return render_template('admin.html', current_page='admin', title='⚙️ ניהול פרסומות והגדרות', description='הגדרת קישורים, באנרים וקודי פרסום בשני אזורי הפרסום של האתר.', authenticated=is_auth, config=cfg)
+    return render_template('admin.html', current_page='admin', title='⚙️ ניהול פרסומות והגדרות', description='הגדרת קישורים, באנרים, שומר שבת וקודי פרסום.', authenticated=is_auth, config=cfg)
 
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
@@ -102,6 +137,9 @@ def admin_save():
         
     cfg = load_ads_config()
     
+    # Shabbat mode
+    cfg['shabbat_mode'] = bool(request.form.get('shabbat_mode'))
+
     # Top ad update
     cfg['top_ad']['enabled'] = bool(request.form.get('top_enabled'))
     cfg['top_ad']['type'] = request.form.get('top_type', 'custom')
@@ -124,7 +162,7 @@ def admin_save():
         cfg['admin_password'] = new_pass
 
     save_ads_config(cfg)
-    return render_template('admin.html', current_page='admin', title='⚙️ ניהול פרסומות', description='ההגדרות נשמרו בהצלחה', authenticated=True, config=cfg, message='✅ כל השינויים נשמרו והפרסומות עודכנו באתר!')
+    return render_template('admin.html', current_page='admin', title='⚙️ ניהול והגדרות', description='ההגדרות נשמרו בהצלחה', authenticated=True, config=cfg, message='✅ כל השינויים וההגדרות נשמרו בהצלחה!')
 
 # ==========================================
 # פעולות ועיבודי קצה (Backend Actions & APIs)
