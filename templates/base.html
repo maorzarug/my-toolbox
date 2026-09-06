@@ -119,17 +119,36 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <div class="page-wrapper">
-            <!-- חלון פרסומת 1: עליון (Native Card) -->
+            
+            <!-- חלון פרסומת 1: עליון (מופיע בכל עמוד) -->
             {% if top_ad and top_ad.enabled %}
                 <div class="ad-slot-container">
                     <div class="ad-card-native">
                         <span class="ad-tag-badge">בחסות</span>
-                        {% if top_ad.type == 'custom' and top_ad.image_url %}
-                            <a href="{{ top_ad.link_url or '#' }}" target="_blank" rel="noopener noreferrer">
-                                <img src="{{ top_ad.image_url }}" alt="{{ top_ad.alt_text or 'פרסומת' }}" class="ad-banner-img">
-                            </a>
-                        {% elif top_ad.type == 'html' and top_ad.html_code %}
+                        {% if top_ad.type == 'html' and top_ad.html_code %}
                             <div>{{ top_ad.html_code|safe }}</div>
+                        {% else %}
+                            {% set is_img = top_ad.image_url and (top_ad.image_url.endswith('.png') or top_ad.image_url.endswith('.jpg') or top_ad.image_url.endswith('.jpeg') or top_ad.image_url.endswith('.webp') or top_ad.image_url.endswith('.gif') or top_ad.image_url.endswith('.svg') or 'alicdn.com' in top_ad.image_url or 'images' in top_ad.image_url) %}
+                            {% set target_link = top_ad.link_url if top_ad.link_url else top_ad.image_url %}
+                            
+                            {% if is_img %}
+                                <a href="{{ target_link or '#' }}" target="_blank" rel="noopener noreferrer">
+                                    <img src="{{ top_ad.image_url }}" alt="{{ top_ad.alt_text or 'פרסומת' }}" class="ad-banner-img">
+                                </a>
+                            {% else %}
+                                <a href="{{ target_link or '#' }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: linear-gradient(135deg, rgba(255, 106, 0, 0.15), rgba(255, 0, 56, 0.1)); border: 1px solid rgba(255, 106, 0, 0.4); border-radius: var(--radius-lg); color: #fff; transition: transform 0.2s;">
+                                    <div style="display: flex; align-items: center; gap: 14px; text-align: right;">
+                                        <span style="font-size: 28px;">🛍️</span>
+                                        <div>
+                                            <div style="font-weight: 800; font-size: 15.5px; color: #ffffff;">{{ top_ad.alt_text if (top_ad.alt_text and top_ad.alt_text != 'פרסומת' and top_ad.alt_text != 'באנר ראשי') else 'מבצעים חמים ובלעדיים ב-AliExpress' }}</div>
+                                            <div style="font-size: 12.5px; color: #cbd5e1;">לחצו כאן למעבר למבצעים המשתלמים ביותר ברשת</div>
+                                        </div>
+                                    </div>
+                                    <span style="background: linear-gradient(135deg, #ff6a00, #ee0979); color: white; padding: 8px 18px; border-radius: 9999px; font-size: 13px; font-weight: 800; box-shadow: 0 4px 12px rgba(255, 106, 0, 0.4); white-space: nowrap;">
+                                        לצפייה במבצע ⬅️
+                                    </span>
+                                </a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -164,17 +183,35 @@
                 {% block content %}{% endblock %}
             </div>
 
-            <!-- חלון פרסומת 2: תחתון (Native Card) -->
+            <!-- חלון פרסומת 2: תחתון (מופיע בכל עמוד) -->
             {% if bottom_ad and bottom_ad.enabled %}
                 <div class="ad-slot-container" style="margin-top: 30px; margin-bottom: 0;">
                     <div class="ad-card-native">
                         <span class="ad-tag-badge">בחסות</span>
-                        {% if bottom_ad.type == 'custom' and bottom_ad.image_url %}
-                            <a href="{{ bottom_ad.link_url or '#' }}" target="_blank" rel="noopener noreferrer">
-                                <img src="{{ bottom_ad.image_url }}" alt="{{ bottom_ad.alt_text or 'פרסומת' }}" class="ad-banner-img">
-                            </a>
-                        {% elif bottom_ad.type == 'html' and bottom_ad.html_code %}
+                        {% if bottom_ad.type == 'html' and bottom_ad.html_code %}
                             <div>{{ bottom_ad.html_code|safe }}</div>
+                        {% else %}
+                            {% set is_img_b = bottom_ad.image_url and (bottom_ad.image_url.endswith('.png') or bottom_ad.image_url.endswith('.jpg') or bottom_ad.image_url.endswith('.jpeg') or bottom_ad.image_url.endswith('.webp') or bottom_ad.image_url.endswith('.gif') or bottom_ad.image_url.endswith('.svg') or 'alicdn.com' in bottom_ad.image_url or 'images' in bottom_ad.image_url) %}
+                            {% set target_link_b = bottom_ad.link_url if bottom_ad.link_url else bottom_ad.image_url %}
+                            
+                            {% if is_img_b %}
+                                <a href="{{ target_link_b or '#' }}" target="_blank" rel="noopener noreferrer">
+                                    <img src="{{ bottom_ad.image_url }}" alt="{{ bottom_ad.alt_text or 'פרסומת' }}" class="ad-banner-img">
+                                </a>
+                            {% else %}
+                                <a href="{{ target_link_b or '#' }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: linear-gradient(135deg, rgba(255, 106, 0, 0.15), rgba(255, 0, 56, 0.1)); border: 1px solid rgba(255, 106, 0, 0.4); border-radius: var(--radius-lg); color: #fff; transition: transform 0.2s;">
+                                    <div style="display: flex; align-items: center; gap: 14px; text-align: right;">
+                                        <span style="font-size: 28px;">🔥</span>
+                                        <div>
+                                            <div style="font-weight: 800; font-size: 15.5px; color: #ffffff;">{{ bottom_ad.alt_text if (bottom_ad.alt_text and bottom_ad.alt_text != 'פרסומת' and bottom_ad.alt_text != 'באנר תחתון') else 'הנחות מיוחדות וקופונים ב-AliExpress' }}</div>
+                                            <div style="font-size: 12.5px; color: #cbd5e1;">לחצו כאן לקבלת קופוני הנחה בלעדיים</div>
+                                        </div>
+                                    </div>
+                                    <span style="background: linear-gradient(135deg, #ff6a00, #ee0979); color: white; padding: 8px 18px; border-radius: 9999px; font-size: 13px; font-weight: 800; box-shadow: 0 4px 12px rgba(255, 106, 0, 0.4); white-space: nowrap;">
+                                        מעבר למבצע ⬅️
+                                    </span>
+                                </a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
