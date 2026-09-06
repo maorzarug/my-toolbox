@@ -6,8 +6,8 @@
     <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); padding: 32px; border-radius: var(--radius-xl); box-shadow: var(--shadow-elevated);">
         <div style="text-align: center; margin-bottom: 24px;">
             <div style="font-size: 36px; margin-bottom: 8px;">🔒</div>
-            <h3 style="font-size: 20px; font-weight: 800; color: #ffffff;">כניסה למערכת ניהול פרסומות</h3>
-            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">הזן סיסמת מנהל כדי לעדכן את הבאנרים וההגדרות</div>
+            <h3 style="font-size: 20px; font-weight: 800; color: #ffffff;">כניסה למערכת ניהול</h3>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">הזן סיסמת מנהל לעדכון הגדרות, פרסומות ושמירת שבת</div>
         </div>
 
         {% if error %}
@@ -30,6 +30,28 @@
             {{ message }}
         </div>
     {% endif %}
+
+    <!-- כרטיס שומר שבת ומועדי ישראל -->
+    <div style="background: rgba(245, 158, 11, 0.03); border: 1px solid rgba(245, 158, 11, 0.25); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(245, 158, 11, 0.15); padding-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">🕯️</span>
+                <h3 style="font-size: 18px; font-weight: 800; color: #fbbf24; margin: 0;">שמירת שבת ומועדי ישראל (אוטומטי)</h3>
+            </div>
+            <label class="btn-action" style="cursor: pointer; gap: 8px; border-color: rgba(245, 158, 11, 0.3);">
+                <input type="checkbox" name="shabbat_mode" value="1" {% if config.shabbat_mode is not defined or config.shabbat_mode %}checked{% endif %} style="accent-color: #fbbf24; width: 16px; height: 16px;">
+                <span style="color: #fbbf24; font-weight: 700;">שומר שבת פעיל</span>
+            </label>
+        </div>
+
+        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
+            כאשר האפשרות מופעלת, האתר יזהה אוטומטית כניסת שבתות וחגי ישראל לפי זמני ירושלים (Hebcal API) ויציג מסך שבת שלום ומבורך עד מוצאי שבת/החג.
+        </p>
+
+        <a href="/shabbat-preview" target="_blank" class="btn-action" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; text-decoration: none; display: inline-flex; font-size: 13px;">
+            👀 צפה בתצוגה מקדימה של מסך שבת
+        </a>
+    </div>
 
     <!-- חלון פרסומת 1 (עליון) -->
     <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-subtle); padding: 24px; border-radius: var(--radius-lg); margin-bottom: 20px;">
@@ -108,7 +130,7 @@
         <input type="password" name="new_password" class="input-modern" placeholder="הכנס סיסמה חדשה...">
     </div>
 
-    <button type="submit" class="submit-btn" style="font-size: 17px; padding: 18px;">💾 שמור את כל הגדרות הפרסומות</button>
+    <button type="submit" class="submit-btn" style="font-size: 17px; padding: 18px;">💾 שמור את כל ההגדרות</button>
 </form>
 {% endif %}
 {% endblock %}
