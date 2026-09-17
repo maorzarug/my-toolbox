@@ -133,7 +133,7 @@
                         
                         {% if is_real_img %}
                             <a href="{{ top_link }}" target="_blank" rel="noopener noreferrer">
-                                <img src="{{ top_img }}" alt="{{ top_ad.alt_text or 'פרסומת' }}" class="promo-banner-media">
+                                <img src="{{ top_img }}" alt="{{ top_ad.alt_text or 'פרסומת' }}" class="promo-banner-media" onerror="this.style.display='none'">
                             </a>
                         {% else %}
                             <a href="{{ top_link }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: linear-gradient(135deg, rgba(255, 106, 0, 0.16), rgba(255, 0, 56, 0.1)); border: 1px solid rgba(255, 106, 0, 0.4); border-radius: var(--radius-lg); color: #fff; transition: transform 0.2s;">
@@ -158,11 +158,11 @@
                 <div class="tool-header-badge">⚡ ToolHub Digital Pro</div>
                 <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -0.8px; margin-bottom: 6px;">{{ title }}</h1>
                 
-                <!-- Pure Floating 3D Logo (100% Transparent Background, No Black Frame/Bars) -->
+                <!-- Pure Floating 3D Logo (100% Transparent Background, Soft Glow, Smooth Anti-Aliasing) -->
                 {% if current_page == 'dashboard' %}
                 <div style="margin: 15px auto 14px auto; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <div style="position: relative; display: inline-block;">
-                        <img src="/icon.png" alt="ToolHub Logo" style="width: 220px; height: auto; max-width: 80vw; object-fit: contain; filter: drop-shadow(0 0 35px rgba(56, 189, 248, 0.5)); display: block; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
+                        <img src="/icon.png" alt="ToolHub Logo" style="width: 220px; height: auto; max-width: 80vw; object-fit: contain; filter: drop-shadow(0 0 35px rgba(56, 189, 248, 0.5)); border-radius: 28px; display: block; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
                     </div>
 
                     <!-- Add to Favorites / Shortcut Button -->
@@ -195,7 +195,7 @@
                         
                         {% if is_real_img_b %}
                             <a href="{{ bot_link }}" target="_blank" rel="noopener noreferrer">
-                                <img src="{{ bot_img }}" alt="{{ bottom_ad.alt_text or 'פרסומת' }}" class="promo-banner-media">
+                                <img src="{{ bot_img }}" alt="{{ bottom_ad.alt_text or 'פרסומת' }}" class="promo-banner-media" onerror="this.style.display='none'">
                             </a>
                         {% else %}
                             <a href="{{ bot_link }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: linear-gradient(135deg, rgba(255, 106, 0, 0.16), rgba(255, 0, 56, 0.1)); border: 1px solid rgba(255, 106, 0, 0.4); border-radius: var(--radius-lg); color: #fff; transition: transform 0.2s;">
