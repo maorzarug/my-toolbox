@@ -2,8 +2,8 @@
 
 :root {
     --bg-base: #090a0f;
-    --bg-surface: rgba(18, 20, 29, 0.7);
-    --bg-surface-hover: rgba(28, 31, 46, 0.85);
+    --bg-surface: rgba(16, 18, 27, 0.75);
+    --bg-surface-hover: rgba(26, 29, 44, 0.85);
     --bg-card: rgba(255, 255, 255, 0.025);
     --bg-card-hover: rgba(255, 255, 255, 0.05);
     --border-subtle: rgba(255, 255, 255, 0.07);
@@ -17,7 +17,7 @@
     --accent-cyan: #38bdf8;
     --accent-indigo: #6366f1;
     --accent-purple: #a855f7;
-    --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+    --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
     --accent-glow: 0 0 25px rgba(56, 189, 248, 0.25);
     
     --success: #10b981;
@@ -77,11 +77,9 @@ body {
     background: rgba(255, 255, 255, 0.25);
 }
 
-/* ==========================================
-   Sidebar Navigation
-   ========================================== */
+/* Sidebar Navigation */
 .sidebar {
-    width: 270px;
+    width: 275px;
     background: var(--bg-surface);
     backdrop-filter: var(--blur-glass);
     -webkit-backdrop-filter: var(--blur-glass);
@@ -98,58 +96,30 @@ body {
 }
 
 .sidebar-header {
-    padding: 22px 20px;
+    padding: 24px 18px 20px 18px;
     border-bottom: 1px solid var(--border-subtle);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.brand-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-}
-
-.brand-logo {
-    width: 38px;
-    height: 38px;
-    border-radius: var(--radius-md);
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
-    object-fit: cover;
-}
-
-.brand-text h2 {
-    font-size: 19px;
-    font-weight: 800;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
-    line-height: 1.1;
-}
-
-.brand-subtitle {
-    font-size: 11.5px;
-    color: var(--text-muted);
-    font-weight: 500;
-    margin-top: 2px;
+    position: relative;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%);
 }
 
 .sidebar-close-btn {
     display: none;
-    background: transparent;
-    border: none;
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
     color: var(--text-muted);
     cursor: pointer;
     padding: 6px;
     border-radius: var(--radius-sm);
     transition: all 0.2s;
+    z-index: 10;
 }
 .sidebar-close-btn:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-nav-title {
@@ -158,11 +128,11 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.8px;
     color: var(--text-muted);
-    padding: 16px 18px 6px 18px;
+    padding: 14px 18px 6px 18px;
 }
 
 .sidebar-menu {
-    padding: 8px 12px;
+    padding: 6px 12px;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -231,16 +201,14 @@ body {
     text-decoration: underline;
 }
 
-/* ==========================================
-   Mobile Top Bar & Backdrop
-   ========================================== */
+/* Mobile Top Bar */
 .mobile-topbar {
     display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 62px;
+    height: 64px;
     background: var(--bg-surface);
     backdrop-filter: var(--blur-glass);
     -webkit-backdrop-filter: var(--blur-glass);
@@ -259,7 +227,7 @@ body {
 }
 
 .mobile-brand h2 {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 800;
     background: var(--accent-gradient);
     -webkit-background-clip: text;
@@ -297,17 +265,15 @@ body {
     opacity: 1;
 }
 
-/* ==========================================
-   Main Content Layout
-   ========================================== */
+/* Main Content Layout */
 .main-content {
-    margin-right: 270px;
+    margin-right: 275px;
     flex-grow: 1;
     padding: 40px 30px 60px 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: calc(100% - 270px);
+    width: calc(100% - 275px);
     min-height: 100vh;
 }
 
@@ -375,9 +341,7 @@ h1 {
     background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3), transparent);
 }
 
-/* ==========================================
-   Dashboard Specifics (Search & Category Pills)
-   ========================================== */
+/* Hero Search & Category Pills */
 .hero-search-box {
     position: relative;
     width: 100%;
@@ -517,9 +481,7 @@ h1 {
     line-height: 1.45;
 }
 
-/* ==========================================
-   Interactive Workspaces & Editors
-   ========================================== */
+/* Workspace Grid */
 .workspace-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -666,9 +628,7 @@ textarea:focus, .input-modern:focus {
     border-color: var(--accent-cyan);
 }
 
-/* ==========================================
-   Drag & Drop Zones
-   ========================================== */
+/* Drag & Drop Zones */
 .file-dropzone {
     border: 2px dashed rgba(255, 255, 255, 0.15);
     padding: 40px 24px;
@@ -720,81 +680,15 @@ textarea:focus, .input-modern:focus {
 }
 
 /* ==========================================
-   Nikud Tool Popup & Interactive Editor
+   Anti-AdBlock Immune Promotional Banners
    ========================================== */
-.interactive-output {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    text-align: right;
-    overflow-y: auto;
-    direction: rtl;
-    line-height: 1.8;
-}
-
-.nikud-word {
-    display: inline-block;
-    white-space: nowrap;
-    margin-left: 6px;
-}
-
-.nikud-char {
-    display: inline-block;
-    cursor: pointer;
-    padding: 0 1px;
-    border-radius: 4px;
-    transition: all 0.15s;
-}
-
-.nikud-char:hover {
-    background: rgba(56, 189, 248, 0.25);
-    color: var(--accent-cyan);
-}
-
-.nikud-char.selected {
-    background: var(--accent-indigo);
-    color: white;
-}
-
-.nikud-menu {
-    display: none;
-    position: absolute;
-    background: #111422;
-    border: 1px solid var(--accent-indigo);
-    border-radius: var(--radius-md);
-    padding: 8px;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    z-index: 1000;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-}
-
-.nikud-menu button {
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    border: 1px solid var(--border-subtle);
-    padding: 6px;
-    font-size: 15px;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    min-width: 38px;
-    transition: all 0.15s;
-}
-
-.nikud-menu button:hover {
-    background: var(--accent-indigo);
-    border-color: var(--accent-indigo);
-}
-
-/* ==========================================
-   Native Ad Cards
-   ========================================== */
-.ad-slot-container {
+.promo-box-container {
     width: 100%;
     max-width: 960px;
     margin-bottom: 24px;
 }
 
-.ad-card-native {
+.partner-card-wrapper {
     background: rgba(255, 255, 255, 0.02);
     border: 1px dashed rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-lg);
@@ -805,12 +699,12 @@ textarea:focus, .input-modern:focus {
     transition: all 0.2s;
 }
 
-.ad-card-native:hover {
+.partner-card-wrapper:hover {
     border-color: var(--accent-cyan);
     background: rgba(255, 255, 255, 0.035);
 }
 
-.ad-tag-badge {
+.partner-tag-pill {
     position: absolute;
     top: 8px;
     left: 12px;
@@ -822,7 +716,7 @@ textarea:focus, .input-modern:focus {
     letter-spacing: 0.5px;
 }
 
-.ad-banner-img {
+.promo-banner-media {
     max-width: 100%;
     height: auto;
     max-height: 100px;
@@ -831,9 +725,7 @@ textarea:focus, .input-modern:focus {
     margin: 0 auto;
 }
 
-/* ==========================================
-   Toast Notification
-   ========================================== */
+/* Toast Notifications */
 .toast-container {
     position: fixed;
     bottom: 24px;
@@ -860,9 +752,7 @@ textarea:focus, .input-modern:focus {
     opacity: 1;
 }
 
-/* ==========================================
-   Responsive Breakpoints
-   ========================================== */
+/* Responsive Breakpoints */
 @media (max-width: 860px) {
     .sidebar {
         transform: translateX(100%);
